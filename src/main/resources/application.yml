@@ -1,0 +1,26 @@
+spring:
+  thymeleaf:
+    cache: false
+  redis:
+    host: localhost
+    port: 6379
+  jackson:
+    default-property-inclusion: non_null
+  mvc:
+    static-path-pattern: /static/**
+    dispatch-options-request: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 65093270
+    url: jdbc:mysql://localhost:3306/im?characterEncoding=utf-8&useSSL=false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8081
+  servlet:
+    context-path: /im
+url:
+  host: http://mango.nat100.top/im
