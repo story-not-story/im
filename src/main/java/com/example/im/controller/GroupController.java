@@ -13,7 +13,6 @@ import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.Code2Enum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,8 +25,7 @@ import java.util.stream.Collectors;
  * @author HuJun
  * @date 2020/3/26 7:54 下午
  */
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/group")
 @Slf4j
 public class GroupController {
@@ -35,7 +33,7 @@ public class GroupController {
     private GroupService groupService;
     @Autowired
     private MemberService memberService;
-    @PostMapping()
+    @PostMapping
     public Result create(@RequestParam String userId, @RequestParam String name, @RequestParam String signature){
         Group group = new Group();
         group.setId(KeyUtil.getUniqueKey());
@@ -48,7 +46,7 @@ public class GroupController {
         member.setUserId(userId);
         member.setGrade(MemberGrade.OWNER.getCode());
          Member memberResult = memberService.add(member);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(2);
         map.put("groupId", groupResult.getId());
         map.put("ownerId", memberResult.getUserId());
         return ResultUtil.success(map);

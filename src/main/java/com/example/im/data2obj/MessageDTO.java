@@ -1,4 +1,4 @@
-package com.example.im.DTO;
+package com.example.im.data2obj;
 
 import lombok.Data;
 

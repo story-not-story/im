@@ -71,25 +71,21 @@ public enum ErrorCode {
      */
     INVITATION_NOT_FOUND(15, "邀请不存在或者已过期"),
     /**
-     * 已拒绝好友添加申请
+     * 已处理好友添加申请
      */
-    INVITATION_ALREADY_REJECT(16, "已拒绝好友添加申请"),
-    /**
-     * 已接受好友添加申请
-     */
-    INVITATION_ALREADY_ACCEPT(17, "已接受好友添加申请"),
+    INVITATION_ALREADY_HANDLE(16, "已处理好友添加申请"),
     /**
      * 修改前后好友备注不能相同
      */
-    REMARK_NOT_SAME(18, "修改前后好友备注不能相同"),
+    REMARK_NOT_SAME(17, "修改前后好友备注不能相同"),
     /**
      * 该群成员不存在
      */
-    MEMBER_NOT_EXISTS(19, "该群成员不存在"),
+    MEMBER_NOT_EXISTS(18, "该群成员不存在"),
     /**
      * 该消息记录不存在
      */
-    MESSAGE_NOT_EXISTS(20, "该消息记录不存在");
+    MESSAGE_NOT_EXISTS(19, "该消息记录不存在");
     private Integer code;
     private String msg;
 

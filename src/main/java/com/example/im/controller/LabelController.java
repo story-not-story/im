@@ -2,32 +2,33 @@ package com.example.im.controller;
 
 import com.example.im.entity.Friend;
 import com.example.im.entity.Label;
+import com.example.im.entity.User;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.LabelException;
+import com.example.im.exception.UserException;
 import com.example.im.result.FriendResult;
 import com.example.im.result.LabelResult;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.service.LabelService;
+import com.example.im.service.UserService;
+import com.example.im.util.CharUtil;
 import com.example.im.util.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author HuJun
  * @date 2020/3/26 8:12 下午
  */
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/label")
 @Slf4j
 public class LabelController {
@@ -35,6 +36,8 @@ public class LabelController {
     private LabelService labelService;
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private UserService userService;
     @PostMapping
     public Result create(@RequestParam String userId, @RequestParam String name){
         List<Label> labelList = labelService.findByUserId(userId);
@@ -49,7 +52,7 @@ public class LabelController {
         label.setName(name);
         label.setUserId(userId);
         Label labelResult  = labelService.save(label);
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>(1);
         map.put("id", labelResult.getId());
         return ResultUtil.success(map);
     }
@@ -86,10 +89,54 @@ public class LabelController {
         return ResultUtil.success(labelList);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/friendlist")
     public Result list(@RequestParam String userId){
         List<Friend> friendList = friendService.findAll(userId);
+        Map<Character, List<FriendResult>> letterMap = new TreeMap<>();
+        Map<String, Object> map = new HashMap<>(3);
+        char other = '#';
+        List<FriendResult> friendResultList = friendList.stream().map(new Function<Friend, FriendResult>() {
+            @Override
+            public FriendResult apply(Friend friend) {
+                FriendResult friendResult = new FriendResult();
+                if (userId.equals(friend.getUserId())){
+                    friendResult.setFriendId(friend.getFriendId());
+                    friendResult.setIsBlacklisted(friend.getIsUserBlacklisted());
+                    friendResult.setLabelId(friend.getULabelId());
+                    friendResult.setRemark(friend.getURemark());
+                } else {
+                    friendResult.setFriendId(friend.getUserId());
+                    friendResult.setIsBlacklisted(friend.getIsFriendBlacklisted());
+                    friendResult.setLabelId(friend.getFLabelId());
+                    friendResult.setRemark(friend.getFRemark());
+                }
+                String remark = friendResult.getRemark();
+                if (remark == null) {
+                    User user =userService.findById(friendResult.getFriendId());
+                    if (user == null) {
+                        log.error("【查找分组好友列表】好友未注册");
+                        throw new UserException(ErrorCode.USER_NOT_EXISTS);
+                    }
+                    remark = user.getName();
+                    friendResult.setRemark(remark);
+                }
+                char letter = CharUtil.toUpper(remark.charAt(0));
+                if (CharUtil.isLetter(letter)) {
+                    if (!letterMap.containsKey(letter)) {
+                        letterMap.put(letter, new ArrayList<FriendResult>());
+                    }
+                    letterMap.get(letter).add(friendResult);
+                } else {
+                    if (!letterMap.containsKey(other)) {
+                        letterMap.put(other, new ArrayList<>());
+                    }
+                    letterMap.get(other).add(friendResult);
+                }
+                return friendResult;
+            }
+        }).collect(Collectors.toList());
         List<Label> labelList = labelService.findByUserId(userId);
+        List<FriendResult> defaultLabelList = new ArrayList<FriendResult>();
         List<LabelResult> labelResultList = new ArrayList<>(labelList.size());
         labelList.forEach(new Consumer<Label>() {
             @Override
@@ -97,23 +144,13 @@ public class LabelController {
                 LabelResult labelResult = new LabelResult();
                 BeanUtils.copyProperties(label, labelResult);
                 List<FriendResult> friendList1 = new ArrayList<FriendResult>();
-                friendList.forEach(new Consumer<Friend>() {
+                friendResultList.forEach(new Consumer<FriendResult>() {
                     @Override
-                    public void accept(Friend friend) {
-                        if (label.getId().equals(friend.getULabelId())){
-                            FriendResult friendResult = new FriendResult();
-                            friendResult.setFriendId(friend.getFriendId());
-                            friendResult.setBlacklisted(friend.getIsUBlacklisted());
-                            friendResult.setLabelId(friend.getULabelId());
-                            friendResult.setRemark(friend.getURemark());
-                            friendList1.add(friendResult);
-                        } else if (label.getId().equals(friend.getFLabelId())){
-                            FriendResult friendResult = new FriendResult();
-                            friendResult.setFriendId(friend.getUserId());
-                            friendResult.setBlacklisted(friend.getIsFBlacklisted());
-                            friendResult.setLabelId(friend.getFLabelId());
-                            friendResult.setRemark(friend.getFRemark());
-                            friendList1.add(friendResult);
+                    public void accept(FriendResult friend) {
+                        if (friend.getLabelId() == null) {
+                            defaultLabelList.add(friend);
+                        } else if (label.getId().equals(friend.getLabelId())){
+                            friendList1.add(friend);
                         }
                     }
                 });
@@ -121,6 +158,13 @@ public class LabelController {
                 labelResultList.add(labelResult);
             }
         });
-        return ResultUtil.success(labelResultList);
+        if (labelList == null || labelList.isEmpty()) {
+            map.put("defaultLabel", friendResultList);
+        } else {
+            map.put("defaultLabel", defaultLabelList);
+        }
+        map.put("labelList", labelResultList);
+        map.put("letterMap", letterMap);
+        return ResultUtil.success(map);
     }
 }

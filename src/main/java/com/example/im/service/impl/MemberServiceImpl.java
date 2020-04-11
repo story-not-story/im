@@ -36,6 +36,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public boolean isMember(String groupId, String userId) {
+        return memberDao.find(groupId, userId) != null;
+    }
+
+    @Override
     public Member updateName(String groupId, String userId, String name) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){
@@ -47,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member updateGrade(String groupId, String userId, byte grade) {
+    public Member updateGrade(String groupId, String userId, Byte grade) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){
             log.error("【退出群成员】该群没有该成员");

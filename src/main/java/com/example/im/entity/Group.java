@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @author HuJun
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 @Entity
 @DynamicUpdate
 @DynamicInsert
+@Table(name = "[group]")
 public class Group {
     @Id
     private String id;

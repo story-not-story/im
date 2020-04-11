@@ -1,6 +1,5 @@
 package com.example.im.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -9,8 +8,17 @@ import lombok.Getter;
  */
 @Getter
 public enum MemberGrade implements CodeEnum{
+    /**
+     * 普通群成员
+     */
     NORMAL(0, "普通"),
+    /**
+     * 群管理员
+     */
     MANAGER(1, "管理员"),
+    /**
+     * 群主
+     */
     OWNER(2, "群主");
     private Byte code;
     private String msg;

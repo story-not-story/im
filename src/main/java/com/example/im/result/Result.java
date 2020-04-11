@@ -2,7 +2,6 @@ package com.example.im.result;
 
 import lombok.Data;
 
-import java.io.Serializable;
 
 /**
  * Result class

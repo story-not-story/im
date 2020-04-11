@@ -20,6 +20,6 @@ public class Member {
     private String id;
     private String groupId;
     private String userId;
-    private Byte grade;
+    private Byte grade = 0;
     private String name;
 }

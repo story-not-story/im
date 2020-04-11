@@ -1,7 +1,6 @@
 package com.example.im.util.converter;
 
 import com.example.im.enums.CodeEnum;
-import com.example.im.enums.MemberGrade;
 
 /**
  * @author: HuJun

@@ -10,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author HuJun
@@ -25,40 +23,40 @@ public class InvitationServiceImpl implements InvitationService {
     private InvitationDao invitationDao;
 
     @Override
-    public Invitation findById(String invitationId) {
-        return invitationDao.findById(invitationId).orElse(null);
+    public Invitation findById(String id) {
+        return invitationDao.findById(id).orElse(null);
     }
 
     @Override
-    public List<Invitation> findByReceiverId(String receiverId) {
-        return invitationDao.findByReceiverId(receiverId);
+    public List<Invitation> findByUserId(String userId) {
+        return invitationDao.findByUserId(userId);
     }
 
     @Override
-    public Invitation accept(String invitationId) {
-        Invitation invitation = findById(invitationId);
+    public Invitation accept(String id) {
+        Invitation invitation = findById(id);
         if (invitation == null){
             log.error("【接受好友添加申请】邀请不存在");
             throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
         }
-        if (invitation.getIsAccepted()){
-            log.error("【接受好友添加申请】已接受好友添加申请");
-            throw new FriendException(ErrorCode.INVITATION_ALREADY_ACCEPT);
+        if (invitation.getIsAccepted() != null){
+            log.error("【接受好友添加申请】该好友添加申请已处理");
+            throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         invitation.setIsAccepted(true);
         return invitationDao.save(invitation);
     }
 
     @Override
-    public Invitation reject(String invitationId) {
-        Invitation invitation = findById(invitationId);
+    public Invitation reject(String id) {
+        Invitation invitation = findById(id);
         if (invitation == null){
             log.error("【拒绝好友添加申请】邀请不存在");
             throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
         }
-        if (!invitation.getIsAccepted()){
-            log.error("【拒绝好友添加申请】已拒绝好友添加申请");
-            throw new FriendException(ErrorCode.INVITATION_ALREADY_REJECT);
+        if (invitation.getIsAccepted() != null){
+            log.error("【拒绝好友添加申请】该好友添加申请已处理");
+            throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         invitation.setIsAccepted(false);
         return invitationDao.save(invitation);

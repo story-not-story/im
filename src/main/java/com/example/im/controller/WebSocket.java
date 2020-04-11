@@ -1,6 +1,6 @@
 package com.example.im.controller;
 
-import com.example.im.DTO.MessageDTO;
+import com.example.im.data2obj.MessageDTO;
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
@@ -10,7 +10,7 @@ import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
 import com.example.im.util.JsonUtil;
 import com.example.im.util.KeyUtil;
-import com.mysql.cj.util.StringUtils;
+import com.example.im.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,10 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ * @author HuJun
+ * @date 2020/3/21 8:42 下午
+ */
 @Component
 @ServerEndpoint("/websocket/{userId}")
 @Slf4j
@@ -62,7 +65,7 @@ public class WebSocket {
             log.error("【收到消息】消息JSON格式错误");
             throw new MessageException(ErrorCode.JSON_ERROR);
         }
-        if (StringUtils.isNullOrEmpty(msg.getId())){
+        if (StringUtil.isNullOrEmpty(msg.getId())){
             msg.setId(KeyUtil.getUniqueKey());
             messageService.save(msg);
         } else {
@@ -78,7 +81,7 @@ public class WebSocket {
         messageDTO.setContent(msg.getContent());
         messageDTO.setStatus(msg.getStatus());
         String content = JsonUtil.toJson(messageDTO);
-        if (StringUtils.isNullOrEmpty(content)){
+        if (StringUtil.isNullOrEmpty(content)){
             log.error("【收到消息】消息JSON格式错误");
             throw new MessageException(ErrorCode.JSON_ERROR);
         }

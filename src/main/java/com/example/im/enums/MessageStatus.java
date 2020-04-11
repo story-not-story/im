@@ -1,6 +1,5 @@
 package com.example.im.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -9,8 +8,17 @@ import lombok.Getter;
  */
 @Getter
 public enum MessageStatus implements CodeEnum{
+    /**
+     * 消息状态正常
+     */
     NORMAL(0, "正常"),
+    /**
+     * 消息已删除
+     */
     DELETED(1, "已删除"),
+    /**
+     * 消息已撤回
+     */
     CANCELED(2, "已撤回");
     private Byte code;
     private String msg;

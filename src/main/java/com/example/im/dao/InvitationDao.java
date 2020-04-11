@@ -13,9 +13,20 @@ import java.util.Optional;
  * @date 2020/3/21 7:46 下午
  */
 public interface InvitationDao extends JpaRepository<Invitation, String> {
-    @Query("select i from Invitation i where i.receiverId = :receiverId and i.gmtCreate > date_sub(current_timestamp(),30)")
-    List<Invitation> findByReceiverId(@Param("receiverId") String receiverId);
+    /**
+     * 根据userId查找添加好友申请列表（30天有效期）
+     * @param userId
+     * @return
+     */
+    @Query(value = "select * from invitation where (receiver_id = :userId or sender_id = :userId) and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
+    List<Invitation> findByUserId(@Param("userId") String userId);
+
+    /**
+     * 根据id查找添加好友申请（30天有效期）
+     * @param id
+     * @return
+     */
     @Override
-    @Query("select i from Invitation i where i.id = :id and i.gmtCreate > date_sub(current_timestamp(),30)")
+    @Query(value = "select * from invitation where id = :id and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
     Optional<Invitation> findById(@Param("id") String id);
 }

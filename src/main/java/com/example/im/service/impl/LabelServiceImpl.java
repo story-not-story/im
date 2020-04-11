@@ -22,12 +22,12 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(Integer id) {
         labelDao.deleteById(id);
     }
 
     @Override
-    public Label findById(int id) {
+    public Label findById(Integer id) {
         return labelDao.findById(id).orElse(null);
     }
 

@@ -6,12 +6,12 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @author HuJun
- * @date 2020/3/21 8:19 下午
+ * @date 2020/4/9 10:16 下午
  */
 @Data
-public class UserForm {
+public class RegisterForm {
     @NotNull
-    private String id;
+    private String name;
     @NotNull
     private String password;
 }

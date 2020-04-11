@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class FriendResult {
     private String friendId;
-    private boolean isBlacklisted;
+    private Boolean isBlacklisted;
     private String remark;
-    private int labelId;
+    private Integer labelId;
 }

@@ -7,7 +7,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -20,10 +19,9 @@ import java.util.Date;
 @DynamicInsert
 public class User {
     @Id
+    @NotNull
     private String id;
-    @NotNull
     private String password;
-    @NotNull
     private String name;
     private String avatar;
     private Boolean sex;

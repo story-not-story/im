@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * @author HuJun
  * @date 2020/4/3 2:08 下午
@@ -22,10 +20,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private MessageDao messageDao;
-    @Override
-    public List<Message> findAll() {
-        return messageDao.find();
-    }
 
     @Override
     public Message findById(String id) {

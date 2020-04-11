@@ -24,7 +24,7 @@ public class Message {
     private String receiverId;
     @NotNull
     private Boolean isGroup;
-    private Byte status;
+    private Byte status = 0;
     private Byte type;
     private String toUserId;
     private Timestamp finishTime;

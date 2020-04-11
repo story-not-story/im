@@ -101,6 +101,28 @@ CREATE TABLE `invitation` (
 -- Dumping data for table `invitation`
 --
 
+CREATE TABLE `group_apply` (
+  `id` varchar(32) NOT NULL,
+  `user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `group_id` varchar(32) NOT NULL COMMENT '群聊 id',
+  `message` varchar(32) DEFAULT NULL COMMENT '加群申请验证信息',
+  `is_accepted` tinyint(1) unsigned DEFAULT NULL COMMENT '是否通过申请',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `group_invitation` (
+  `id` varchar(32) NOT NULL,
+  `sender_id` varchar(32) NOT NULL COMMENT '邀请者',
+  `receiver_id` varchar(32) NOT NULL COMMENT '被邀请者',
+  `group_id` varchar(32) NOT NULL COMMENT '群聊id',
+  `is_accepted` tinyint(1) unsigned DEFAULT NULL COMMENT '是否通过申请',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 LOCK TABLES `invitation` WRITE;
 /*!40000 ALTER TABLE `invitation` DISABLE KEYS */;
 /*!40000 ALTER TABLE `invitation` ENABLE KEYS */;
@@ -221,7 +243,7 @@ CREATE TABLE `user` (
 CREATE TABLE `login` (
   `id` varchar(32) NOT NULL,
   `ip` varchar(16) NOT NULL COMMENT 'IP地址',
-  `port` tinyint unsigned NOT NULL COMMENT '端口号',
+  `port` int unsigned NOT NULL COMMENT '端口号',
   `status` tinyint(1) unsigned DEFAULT NULL COMMENT '在线状态',
   `user_id` varchar(32) NOT NULL COMMENT '用户账号',
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

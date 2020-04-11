@@ -7,7 +7,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 /**
  * @author HuJun
@@ -28,5 +27,4 @@ public class Invitation {
     private String message;
     private Boolean isAccepted;
     private String remark;
-    private Timestamp gmtCreate;
 }

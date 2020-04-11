@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -20,8 +21,10 @@ public class Friend {
     private String id;
     private String userId;
     private String friendId;
-    private Boolean isUBlacklisted;
-    private Boolean isFBlacklisted;
+    @Column(name = "is_u_blacklisted")
+    private Boolean isUserBlacklisted = false;
+    @Column(name = "is_f_blacklisted")
+    private Boolean isFriendBlacklisted = false;
     private String uRemark;
     private String fRemark;
     private Integer uLabelId;

@@ -1,11 +1,13 @@
 package com.example.im.exception;
 
 import com.example.im.enums.ErrorCode;
+import lombok.Getter;
 
 /**
  * @author HuJun
  * @date 2020/3/21 10:10 下午
  */
+@Getter
 public class FriendException extends RuntimeException {
     private Integer code;
 

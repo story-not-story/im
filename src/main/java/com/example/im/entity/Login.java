@@ -19,7 +19,7 @@ public class Login {
     @Id
     private String id;
     private String ip;
-    private Byte port;
+    private Integer port;
     private Boolean status;
     private String userId;
 }

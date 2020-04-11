@@ -1,11 +1,13 @@
 package com.example.im.exception;
 
 import com.example.im.enums.ErrorCode;
+import lombok.Getter;
 
 /**
  * @author HuJun
  * @date 2020/3/23 12:41 下午
  */
+@Getter
 public class GroupException extends RuntimeException  {
     private Integer code;
 
