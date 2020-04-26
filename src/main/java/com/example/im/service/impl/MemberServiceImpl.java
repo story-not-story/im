@@ -41,6 +41,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member findOne(String groupId, String userId) {
+        return memberDao.find(groupId, userId);
+    }
+
+    @Override
     public Member updateName(String groupId, String userId, String name) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){

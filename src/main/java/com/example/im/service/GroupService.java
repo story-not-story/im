@@ -2,6 +2,8 @@ package com.example.im.service;
 
 import com.example.im.entity.Group;
 
+import java.util.List;
+
 
 /**
  * @author HuJun
@@ -14,6 +16,13 @@ public interface GroupService {
      * @return
      */
     Group findById(String id);
+
+    /**
+     * 根据name模糊匹配查找群聊
+     * @param name
+     * @return
+     */
+    List<Group> findByName(String name);
 
     /**
      * 保存群

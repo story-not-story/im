@@ -85,7 +85,11 @@ public enum ErrorCode {
     /**
      * 该消息记录不存在
      */
-    MESSAGE_NOT_EXISTS(19, "该消息记录不存在");
+    MESSAGE_NOT_EXISTS(19, "该消息记录不存在"),
+    /**
+     * websocket发生错误
+     */
+    WEBSOCKET_ERROR(20, "websocket发生错误，等待自动重连");
     private Integer code;
     private String msg;
 

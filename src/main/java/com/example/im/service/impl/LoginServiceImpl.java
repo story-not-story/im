@@ -31,8 +31,9 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public List<Login> findByUserId(String userId) {
-        return loginDao.findByUserId(userId);
+    public boolean isLogin(String userId) {
+        Login login = loginDao.findTopByUserId(userId);
+        return login.getStatus();
     }
 
     public String getIpAddr(HttpServletRequest request) {

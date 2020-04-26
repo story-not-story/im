@@ -18,7 +18,7 @@ public interface InvitationDao extends JpaRepository<Invitation, String> {
      * @param userId
      * @return
      */
-    @Query(value = "select * from invitation where (receiver_id = :userId or sender_id = :userId) and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
+    @Query(value = "select * from invitation i where (i.receiver_id = :userId or i.sender_id = :userId) and  i.gmt_create = (select max(gmt_create) from invitation where receiver_id = i.receiver_id and sender_id = i.sender_id and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY))", nativeQuery = true)
     List<Invitation> findByUserId(@Param("userId") String userId);
 
     /**

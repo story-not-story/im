@@ -5,11 +5,14 @@ import com.example.im.entity.Invitation;
 import com.example.im.entity.Label;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.FriendException;
+import com.example.im.exception.LabelException;
+import com.example.im.result.InvitationResult;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.service.InvitationService;
 import com.example.im.service.LabelService;
 import com.example.im.util.ResultUtil;
+import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -46,29 +49,38 @@ public class InvitationController {
         map.put("id", invitationResult.getId());
         return ResultUtil.success(map);
     }
-    @GetMapping("/list")
+    @GetMapping("/detail")
+    public Result detail(@RequestParam String id, @RequestParam String userId){
+        Invitation invitation = invitationService.findById(id);
+        InvitationResult invitationResult = DO2VO.convert(invitation, userId);
+        return ResultUtil.success(invitationResult);
+    }
+
+    @GetMapping()
     public Result list(@RequestParam String userId){
         List<Invitation> invitationList = invitationService.findByUserId(userId);
-        return ResultUtil.success(invitationList);
+        List<InvitationResult> invitationResultList = DO2VO.convert(invitationList, userId);
+        return ResultUtil.success(invitationResultList);
     }
 
     @GetMapping("/reject")
-    public Result reject(@RequestParam String invitationId){
-        Invitation invitation = invitationService.reject(invitationId);
+    public Result reject(@RequestParam String id){
+        Invitation invitation = invitationService.reject(id);
         return ResultUtil.success(invitation);
     }
 
     @GetMapping("/accept")
-    public Result accept(@RequestParam String invitationId){
-        Invitation invitation = invitationService.accept(invitationId);
+    public Result accept(@RequestParam String id){
+        Invitation invitation = invitationService.accept(id);
         Friend friend = new Friend();
         friend.setUserId(invitation.getSenderId());
         friend.setFriendId(invitation.getReceiverId());
         friend.setURemark(invitation.getRemark());
         friend.setULabelId(invitation.getLabelId());
         if (invitation.getLabelId() != null){
-            Label label = labelService.findById(invitation.getLabelId());
-            if (label == null){
+            try {
+                labelService.findById(invitation.getLabelId());
+            } catch (LabelException e) {
                 friend.setULabelId(null);
             }
         }

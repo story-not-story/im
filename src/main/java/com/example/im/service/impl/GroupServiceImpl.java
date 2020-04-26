@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * @author HuJun
  * @date 2020/3/21 8:05 下午
@@ -20,7 +23,18 @@ public class GroupServiceImpl implements GroupService {
     private GroupDao groupDao;
     @Override
     public Group findById(String id) {
-        return groupDao.findById(id).orElse(null);
+        Optional<Group> group = groupDao.findById(id);
+        if (group.isPresent()) {
+            return group.get();
+        } else {
+            log.error("【按照id查找群聊】群聊不存在");
+            throw new GroupException(ErrorCode.GROUP_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public List<Group> findByName(String name) {
+        return groupDao.findByNameIdLike(name);
     }
 
     @Override
@@ -31,10 +45,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void deleteById(String id) {
         Group group = findById(id);
-        if (group == null){
-            log.error("【解散群】群不存在");
-            throw new GroupException(ErrorCode.GROUP_NOT_EXISTS);
-        }
         groupDao.deleteById(id);
     }
 }

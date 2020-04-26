@@ -20,9 +20,9 @@ public interface LoginService {
     Login save(String userId, Boolean status, HttpServletRequest request);
 
     /**
-     * 根据userId查找用户登录登出信息
+     * 根据userId查找用户当前登录状态
      * @param userId
      * @return
      */
-    List<Login> findByUserId(String userId);
+    boolean isLogin(String userId);
 }

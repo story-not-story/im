@@ -9,14 +9,12 @@ import com.example.im.form.RegisterForm;
 import com.example.im.result.Result;
 import com.example.im.service.LoginService;
 import com.example.im.service.UserService;
-import com.example.im.util.CookieUtil;
-import com.example.im.util.CopyUtil;
-import com.example.im.util.KeyUtil;
-import com.example.im.util.ResultUtil;
+import com.example.im.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * @author HuJun
@@ -72,10 +72,6 @@ public class UserController {
         }
         String id = loginForm.getId();
         User user = userService.findById(id);
-        if (user == null){
-            log.error("【用户登录】用户未注册");
-            throw new UserException(ErrorCode.USER_NOT_EXISTS);
-        }
         if (!user.getPassword().equals(loginForm.getPassword())){
             log.error("【用户登录】密码或用户名错误");
         }
@@ -108,6 +104,23 @@ public class UserController {
         return ResultUtil.success(user);
     }
 
+    @GetMapping("/list")
+    public Result list(@RequestParam String text){
+        if (Pattern.matches("\\d+", text)) {
+            try {
+                User user = userService.findById(text);
+                user.setPassword(null);
+                return ResultUtil.success(user);
+            } catch (UserException e) {}
+        }
+        List<User> userList = userService.findByName(text);
+        if (CollectionUtils.isEmpty(userList)) {
+            return ResultUtil.error(ErrorCode.USER_NOT_EXISTS);
+        }
+        userList.forEach(o -> o.setPassword(null));
+        return ResultUtil.success(userList);
+    }
+
     @PutMapping("/userinfo")
     public Result userinfoUpdate(@Valid User user, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -115,7 +128,7 @@ public class UserController {
             throw new UserException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
         }
         User result = userService.findById(user.getId());
-        CopyUtil.copyProperties(user, result);
+        BeanUtil.copyProperties(user, result);
         userService.save(result);
         return ResultUtil.success();
     }

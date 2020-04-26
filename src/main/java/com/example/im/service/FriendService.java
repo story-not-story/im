@@ -1,6 +1,7 @@
 package com.example.im.service;
 
 import com.example.im.entity.Friend;
+import com.example.im.entity.Group;
 
 import java.util.List;
 
@@ -71,4 +72,12 @@ public interface FriendService {
      * @return
      */
     List<Friend> findAll(String userId);
+
+    /**
+     * 根据userId,friendId查找好友联系
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    public Friend findOne(String userId, String friendId);
 }

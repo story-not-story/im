@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import sun.jvm.hotspot.debugger.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author HuJun
@@ -31,7 +32,13 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     private FriendService friendService;
     @Override
     public GroupInvitation findById(String id) {
-        return invitationDao.findById(id).orElse(null);
+        Optional<GroupInvitation> groupInvitation = invitationDao.findById(id);
+        if (groupInvitation.isPresent()) {
+            return groupInvitation.get();
+        } else {
+            log.error("【根据id查找群邀请】群邀请不存在");
+            throw new GroupException(ErrorCode.INVITATION_NOT_FOUND);
+        }
     }
 
     @Override
@@ -42,10 +49,6 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     @Override
     public GroupInvitation accept(String id) {
         GroupInvitation invitation = findById(id);
-        if (invitation == null){
-            log.error("【接受好友添加申请】邀请不存在");
-            throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
-        }
         if (invitation.getIsAccepted() != null){
             log.error("【接受好友添加申请】该好友添加申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
@@ -57,10 +60,6 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     @Override
     public GroupInvitation reject(String id) {
         GroupInvitation invitation = findById(id);
-        if (invitation == null){
-            log.error("【拒绝好友添加申请】邀请不存在");
-            throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
-        }
         if (invitation.getIsAccepted() != null){
             log.error("【拒绝好友添加申请】该好友添加申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);

@@ -1,4 +1,4 @@
-package com.example.im.data2obj;
+package com.example.im.dto;
 
 import lombok.Data;
 
@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class MessageDTO {
     private String id;
+    private String senderId;
     private String content;
     private Byte status;
 }

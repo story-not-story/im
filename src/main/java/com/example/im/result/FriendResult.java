@@ -12,4 +12,7 @@ public class FriendResult {
     private Boolean isBlacklisted;
     private String remark;
     private Integer labelId;
+    private String avatar;
+    private String signature;
+    private String name;
 }

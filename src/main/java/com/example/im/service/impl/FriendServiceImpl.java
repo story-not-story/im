@@ -2,6 +2,7 @@ package com.example.im.service.impl;
 
 import com.example.im.dao.FriendDao;
 import com.example.im.entity.Friend;
+import com.example.im.entity.Group;
 import com.example.im.entity.Label;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.FriendException;
@@ -56,6 +57,11 @@ public class FriendServiceImpl implements FriendService {
             log.error("【删除好友】该用户不存在");
             throw new UserException(ErrorCode.USER_NOT_EXISTS);
         }
+    }
+
+    @Override
+    public Friend findOne(String userId, String friendId) {
+        return friendDao.find(userId, friendId);
     }
 
     @Override
@@ -123,8 +129,8 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public Friend move(String userId, String friendId, Integer labelId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Label label = null;
-            if ((label = labelService.findById(labelId)) == null || !userId.equals(label.getUserId())) {
+            Label label = labelService.findById(labelId);
+            if (!userId.equals(label.getUserId())) {
                 log.error("【改变好友所在分组】分组不存在");
                 throw new FriendException(ErrorCode.LABEL_NOT_EXISTS);
             }

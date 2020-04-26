@@ -1,15 +1,17 @@
 package com.example.im.controller;
 
-import com.example.im.data2obj.MessageDTO;
+import com.example.im.dto.MessageDTO;
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MessageStatus;
 import com.example.im.exception.MessageException;
+import com.example.im.service.LoginService;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
 import com.example.im.util.JsonUtil;
 import com.example.im.util.KeyUtil;
+import com.example.im.util.ResultUtil;
 import com.example.im.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +33,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocket {
     private Session session;
     private String userId;
+    public static final String HEARTBEAT_REQ = "websocket_test";
+    public static final String HEARTBEAT_RES = "ok";
     private static ConcurrentHashMap<String, WebSocket> webSocketMap = new ConcurrentHashMap<>();
 
+    private  static LoginService loginService;
+    @Autowired
+    public void setLoginService(LoginService loginService){
+        WebSocket.loginService = loginService;
+    }
 
     private  static MemberService memberService;
     @Autowired
@@ -59,6 +68,10 @@ public class WebSocket {
     }
     @OnMessage
     public void onMessage(String message){
+        if (HEARTBEAT_REQ.equals(JsonUtil.getValue(message, "content"))) {
+            sendPointMessage(JsonUtil.getValue(message, "userId"), HEARTBEAT_RES, null);
+            return;
+        }
         log.info("收到消息:{}", message);
         Message msg = JsonUtil.toObject(message, Message.class);
         if (msg == null){
@@ -76,8 +89,12 @@ public class WebSocket {
                 messageService.delete(msg.getId());
             }
         }
+        if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId())) {
+            return;
+        }
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(msg.getId());
+        messageDTO.setSenderId(msg.getSenderId());
         messageDTO.setContent(msg.getContent());
         messageDTO.setStatus(msg.getStatus());
         String content = JsonUtil.toJson(messageDTO);
@@ -88,7 +105,7 @@ public class WebSocket {
         if (msg.getIsGroup()){
             sendGroupMessage(msg.getReceiverId(), content);
         } else {
-            sendPointMessage(msg.getReceiverId(), content);
+            sendPointMessage(msg.getReceiverId(), content, msg.getSenderId());
         }
     }
     @OnError
@@ -101,8 +118,10 @@ public class WebSocket {
          for (Member member:
               memberList) {
              try {
-                 webSocketMap.get(member.getUserId()).session.getBasicRemote().sendText(message);
-
+                 String userId = member.getUserId();
+                 if (webSocketMap.get(userId) != null) {
+                     webSocketMap.get(userId).session.getBasicRemote().sendText(message);
+                 }
              } catch (IOException e) {
                  e.printStackTrace();
                  log.error("【websocket广播消息】I/O发生错误");
@@ -110,9 +129,13 @@ public class WebSocket {
          }
      }
 
-    public void sendPointMessage(String userId, String message){
+    public void sendPointMessage(String userId, String message, String senderId){
         try {
-            webSocketMap.get(userId).session.getBasicRemote().sendText(message);
+            if (webSocketMap.get(userId) != null) {
+                webSocketMap.get(userId).session.getBasicRemote().sendText(message);
+            } else if (senderId != null){
+                webSocketMap.get(senderId).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.WEBSOCKET_ERROR)));
+            }
         } catch (IOException e) {
             e.printStackTrace();
             log.error("【websocket点对点消息】I/O发生错误");

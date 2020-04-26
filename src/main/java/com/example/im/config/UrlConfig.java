@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Data
-@ConfigurationProperties(prefix = "project-url")
+@ConfigurationProperties(prefix = "url")
 public class UrlConfig {
     private String host;
 }

@@ -27,7 +27,7 @@ public interface GroupApplyDao extends JpaRepository<GroupApply, String> {
      * @return
      */
     @Query(value = "select * from group_apply where user_id = :userId and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
-    List<GroupApply> findByUserId(@Param("groupId") String userId);
+    List<GroupApply> findByUserId(@Param("userId") String userId);
 
     /**
      * 根据id查找加群申请（30天有效期）

@@ -2,6 +2,8 @@ package com.example.im.service;
 
 import com.example.im.entity.User;
 
+import java.util.List;
+
 /**
  * @author HuJun
  * @date 2020/3/21 7:54 下午
@@ -13,6 +15,13 @@ public interface UserService {
      * @return
      */
     User findById(String id);
+
+    /**
+     * 根据name模糊匹配查找用户
+     * @param name
+     * @return
+     */
+    List<User> findByName(String name);
 
     /**
      * 保存永辉

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author HuJun
@@ -24,7 +25,13 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public Invitation findById(String id) {
-        return invitationDao.findById(id).orElse(null);
+        Optional<Invitation> invitation = invitationDao.findById(id);
+        if (invitation.isPresent()) {
+            return invitation.get();
+        } else {
+            log.error("【根据id查找添加好友申请】添加好友申请不存在");
+            throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
+        }
     }
 
     @Override
@@ -35,10 +42,6 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     public Invitation accept(String id) {
         Invitation invitation = findById(id);
-        if (invitation == null){
-            log.error("【接受好友添加申请】邀请不存在");
-            throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
-        }
         if (invitation.getIsAccepted() != null){
             log.error("【接受好友添加申请】该好友添加申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
@@ -50,10 +53,6 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     public Invitation reject(String id) {
         Invitation invitation = findById(id);
-        if (invitation == null){
-            log.error("【拒绝好友添加申请】邀请不存在");
-            throw new FriendException(ErrorCode.INVITATION_NOT_FOUND);
-        }
         if (invitation.getIsAccepted() != null){
             log.error("【拒绝好友添加申请】该好友添加申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);

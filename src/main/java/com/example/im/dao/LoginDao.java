@@ -3,6 +3,8 @@ package com.example.im.dao;
 
 import com.example.im.entity.Login;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -16,5 +18,6 @@ public interface LoginDao extends JpaRepository<Login, String> {
      * @param userId
      * @return
      */
-    List<Login> findByUserId(String userId);
+    @Query(value = "select * from login where user_id = :userId order by gmt_create desc limit 1", nativeQuery = true)
+    Login findTopByUserId(@Param("userId") String userId);
 }

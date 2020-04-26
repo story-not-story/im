@@ -18,7 +18,7 @@ import java.util.List;
  * @author HuJun
  * @date 2020/4/10 12:42 上午
  */
-public class CopyUtil {
+public class BeanUtil {
     public static void copyProperties(Object source, Object target) throws BeansException {
         copyProperties(source, target, null, (String[]) null);
     }

@@ -2,14 +2,19 @@ package com.example.im.controller;
 
 import com.example.im.entity.Member;
 import com.example.im.entity.User;
+import com.example.im.exception.UserException;
+import com.example.im.result.MemberResult;
 import com.example.im.result.Result;
 import com.example.im.service.*;
 import com.example.im.util.ResultUtil;
+import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -29,12 +34,15 @@ public class MemberController {
     @GetMapping
     public Result list(@RequestParam String groupId){
         List<Member> memberList = memberService.findByGroupId(groupId);
-        List<User> userList = memberList.stream().map(m -> {
-            User user = userService.findById(m.getUserId());
-            user.setPassword(null);
-            return user;
-        }).collect(Collectors.toList());
+        List<MemberResult> userList = memberList.stream().map(m -> DO2VO.convert(m)).collect(Collectors.toList());
         return ResultUtil.success(userList);
+    }
+
+    @GetMapping("/isMember")
+    public Result isMember(@RequestParam String userId, @RequestParam String groupId) {
+        Map<String, Boolean> map = new HashMap<>(1);
+        map.put("isMember", memberService.isMember(groupId, userId));
+        return ResultUtil.success(map);
     }
 
     @DeleteMapping

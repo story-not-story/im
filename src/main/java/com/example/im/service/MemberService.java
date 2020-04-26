@@ -32,6 +32,14 @@ public interface MemberService {
     boolean isMember(String groupId, String userId);
 
     /**
+     * 根据groupId,userId查找群成员
+     * @param groupId
+     * @param userId
+     * @return
+     */
+    Member findOne(String groupId, String userId);
+
+    /**
      * 修改群昵称
      * @param groupId
      * @param userId

@@ -2,6 +2,7 @@ package com.example.im.util;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,5 +17,8 @@ public class JsonUtil {
     }
     public static String toJson(Object object){
         return JSON.toJSONString(object);
+    }
+    public static String getValue(String str, String key) {
+        return JSON.parseObject(str).getString(key);
     }
 }

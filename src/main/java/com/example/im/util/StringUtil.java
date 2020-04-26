@@ -1,5 +1,7 @@
 package com.example.im.util;
 
+import java.util.Collection;
+
 /**
  * @author HuJun
  * @date 2020/4/10 1:05 上午

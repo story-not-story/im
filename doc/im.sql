@@ -61,6 +61,7 @@ CREATE TABLE `group` (
   `name` varchar(32) NOT NULL COMMENT '名称',
   `signature` varchar(32) DEFAULT NULL COMMENT '群签名',
   `notice` varchar(64) DEFAULT NULL COMMENT '群公告',
+  `avatar` varchar(64) DEFAULT NULL COMMENT '头像',
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
