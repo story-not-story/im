@@ -89,7 +89,11 @@ public enum ErrorCode {
     /**
      * websocket发生错误
      */
-    WEBSOCKET_ERROR(20, "websocket发生错误，等待自动重连");
+    WEBSOCKET_ERROR(20, "websocket发生错误，等待自动重连"),
+    /**
+     * 对方离线，请刷新页面
+     */
+    REFRESH(21, "对方离线，请刷新页面");
     private Integer code;
     private String msg;
 

@@ -90,6 +90,12 @@ public class WebSocket {
             }
         }
         if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId())) {
+            try {
+            webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.REFRESH)));
+            } catch(IOException e) {
+                e.printStackTrace();
+                log.error("【websocket点对点消息】I/O发生错误");
+            }
             return;
         }
         MessageDTO messageDTO = new MessageDTO();

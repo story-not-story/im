@@ -71,6 +71,10 @@ public class UserController {
             throw new UserException(ErrorCode.USER_ALREADY_LOGIN);
         }
         String id = loginForm.getId();
+//        if (loginService.isLogin(id)) {//cookie会失效
+//            log.error("【用户登录】用户已登录");
+//            throw new UserException(ErrorCode.USER_ALREADY_LOGIN);
+//        }
         User user = userService.findById(id);
         if (!user.getPassword().equals(loginForm.getPassword())){
             log.error("【用户登录】密码或用户名错误");
