@@ -57,7 +57,7 @@ public interface MessageService {
      * @param id
      * @return
      */
-    Message delete(String id);
+    Message delete(String id, String userId);
 
     /**
      *

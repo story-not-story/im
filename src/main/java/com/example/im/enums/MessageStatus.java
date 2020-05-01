@@ -13,13 +13,17 @@ public enum MessageStatus implements CodeEnum{
      */
     NORMAL(0, "正常"),
     /**
-     * 消息已删除
+     * 消息对senderId、receiverId都不可见
      */
-    DELETED(1, "已删除"),
+    CANCELED(1, "已撤回"),
     /**
-     * 消息已撤回
+     * 消息只对senderId可见
      */
-    CANCELED(2, "已撤回");
+    VISIBLE_S(2, "消息只对senderId可见"),
+    /**
+     * 消息只对receiverId可见
+     */
+    VISIBLE_R(3, "消息只对receiverId可见");
     private Byte code;
     private String msg;
 

@@ -196,7 +196,7 @@ CREATE TABLE `message` (
   `sender_id` varchar(32) NOT NULL COMMENT '发送者',
   `receiver_id` varchar(32) NOT NULL COMMENT '接收者',
   `is_group` tinyint(1) unsigned NOT NULL COMMENT '是否群消息',
-  `status` tinyint unsigned DEFAULT '0' COMMENT '消息状态(0正常1删除2撤回)',
+  `status` tinyint unsigned DEFAULT '0' COMMENT '消息状态(0正常1撤回2只发送者可见3只接收者可见)',
   `type` tinyint(4) DEFAULT NULL COMMENT '消息类型(0文字1表情2图片3文件4视频5通话)',
   `to_user_id` varchar(32) DEFAULT NULL COMMENT '@用户id',
   `finish_time` datetime DEFAULT NULL COMMENT '通话结束时间',

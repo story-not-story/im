@@ -10,15 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -51,11 +49,18 @@ public class MessageController {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by(Sort.Direction.DESC, "gmt_create"));
         List<Message> messageList = null;
         if (isGroup) {
-            messageList = messageService.findByGroupId(otherId, pageable);
+            messageList = messageService.findByGroupId(otherId, pageable);//staus删除不适用群聊
         } else {
             messageList = messageService.findByFriend(userId, otherId, pageable);
         }
         List<MessageResult> messageResultList = DO2VO.convert(messageList, userId, true);
+        Collections.reverse(messageResultList);
         return ResultUtil.success(messageResultList);
+    }
+
+    @GetMapping("/delete")
+    public Result delete(@RequestParam String id, @RequestParam String userId){
+        messageService.delete(id, userId);
+        return ResultUtil.success();
     }
 }

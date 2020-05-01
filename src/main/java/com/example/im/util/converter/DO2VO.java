@@ -154,6 +154,52 @@ public class DO2VO {
         }).collect(Collectors.toList());
     }
 
+    public static MessageResult convert(Message message, String userId, boolean isDetail) {
+        MessageResult messageResult = new MessageResult();
+        BeanUtil.copyProperties(message, messageResult);
+        String senderId = message.getSenderId();
+        String receiverId = message.getReceiverId();
+        if (message.getIsGroup()) {
+            Group group = null;
+            if (isDetail) {
+                Member member = memberService.findOne(receiverId, senderId);
+                User user = userService.findById(senderId);
+                String name = null;
+                if (member.getName() != null) {
+                    name = member.getName();
+                } else {
+                    name = user.getName();
+                }
+                messageResult.setAvatar(user.getAvatar());
+                messageResult.setName(name);
+            } else {
+                group = groupService.findById(receiverId);
+                messageResult.setAvatar(group.getAvatar());
+                messageResult.setName(group.getName());
+            }
+        } else {
+            User user = null;
+            String name = null;
+            if (isDetail) {
+                user = userService.findById(senderId);
+                name = user.getName();
+            } else {
+                if (userId.equals(senderId)) {
+                    user = userService.findById(receiverId);
+                } else {
+                    user = userService.findById(senderId);
+                }
+                Friend friend = friendService.findOne(senderId, receiverId);
+                if (friend == null || (name = convert(friend, userId).getRemark()) == null) {
+                    name = user.getName();
+                }
+            }
+            messageResult.setAvatar(user.getAvatar());
+            messageResult.setName(name);
+        }
+        return messageResult;
+    }
+
     public static MemberResult convert(Member member) {
         MemberResult memberResult = new MemberResult();
         BeanUtil.copyProperties(member, memberResult);

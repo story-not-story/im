@@ -71,13 +71,25 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Message delete(String id) {
+    public Message delete(String id, String userId) {
         Message message = findById(id);
         if (message == null){
             log.error("【撤回消息】该消息记录不存在");
             throw new MessageException(ErrorCode.MESSAGE_NOT_EXISTS);
         }
-        message.setStatus(MessageStatus.DELETED.getCode());
+        if (userId.equals(message.getSenderId())) {
+            if (MessageStatus.NORMAL.getCode().equals(message.getStatus())) {
+                message.setStatus(MessageStatus.VISIBLE_R.getCode());
+            } else if (MessageStatus.VISIBLE_S.getCode().equals(message.getStatus())){
+                message.setStatus(MessageStatus.CANCELED.getCode());
+            }
+        } else {
+            if (MessageStatus.NORMAL.getCode().equals(message.getStatus())) {
+                message.setStatus(MessageStatus.VISIBLE_S.getCode());
+            } else if (MessageStatus.VISIBLE_R.getCode().equals(message.getStatus())){
+                message.setStatus(MessageStatus.CANCELED.getCode());
+            }
+        }
         messageDao.save(message);
         return message;
     }

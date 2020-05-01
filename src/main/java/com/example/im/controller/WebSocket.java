@@ -1,11 +1,12 @@
 package com.example.im.controller;
 
-import com.example.im.dto.MessageDTO;
+
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MessageStatus;
 import com.example.im.exception.MessageException;
+import com.example.im.result.MessageResult;
 import com.example.im.service.LoginService;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
@@ -13,6 +14,7 @@ import com.example.im.util.JsonUtil;
 import com.example.im.util.KeyUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.StringUtil;
+import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -85,28 +87,21 @@ public class WebSocket {
             if (MessageStatus.CANCELED.getCode().equals(msg.getStatus())){
                 messageService.cancel(msg.getId());
             }
-            if (MessageStatus.DELETED.getCode().equals(msg.getStatus())){
-                messageService.delete(msg.getId());
-            }
         }
-        if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId())) {
+        MessageResult messageResult = DO2VO.convert(msg,  "", true);
+        String content = JsonUtil.toJson(ResultUtil.success(messageResult));
+        if (StringUtil.isNullOrEmpty(content)){
+            log.error("【收到消息】消息JSON格式错误");
+            throw new MessageException(ErrorCode.JSON_ERROR);
+        }
+        if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId()) && MessageStatus.NORMAL.getCode().equals(msg.getStatus())) {
             try {
-            webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.REFRESH)));
+                webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(content);
             } catch(IOException e) {
                 e.printStackTrace();
                 log.error("【websocket点对点消息】I/O发生错误");
             }
             return;
-        }
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setId(msg.getId());
-        messageDTO.setSenderId(msg.getSenderId());
-        messageDTO.setContent(msg.getContent());
-        messageDTO.setStatus(msg.getStatus());
-        String content = JsonUtil.toJson(messageDTO);
-        if (StringUtil.isNullOrEmpty(content)){
-            log.error("【收到消息】消息JSON格式错误");
-            throw new MessageException(ErrorCode.JSON_ERROR);
         }
         if (msg.getIsGroup()){
             sendGroupMessage(msg.getReceiverId(), content);
@@ -137,8 +132,12 @@ public class WebSocket {
 
     public void sendPointMessage(String userId, String message, String senderId){
         try {
+
             if (webSocketMap.get(userId) != null) {
                 webSocketMap.get(userId).session.getBasicRemote().sendText(message);
+                if (senderId != null) {
+                    webSocketMap.get(senderId).session.getBasicRemote().sendText(message);
+                }
             } else if (senderId != null){
                 webSocketMap.get(senderId).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.WEBSOCKET_ERROR)));
             }
