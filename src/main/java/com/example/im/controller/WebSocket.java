@@ -82,7 +82,7 @@ public class WebSocket {
         }
         if (StringUtil.isNullOrEmpty(msg.getId())){
             msg.setId(KeyUtil.getUniqueKey());
-            messageService.save(msg);
+            msg = messageService.save(msg);
         } else {
             if (MessageStatus.CANCELED.getCode().equals(msg.getStatus())){
                 messageService.cancel(msg.getId());

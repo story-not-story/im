@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class CookieUtil {
     public static final String TOKEN = "token";
-    public static final int EXPIRE = 7200;
+    public static final int EXPIRE = 604800;//用户登录后cookie有效期7天
     public static void set(HttpServletResponse response, String name, String value, int maxAge){
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
