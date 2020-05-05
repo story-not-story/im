@@ -3,6 +3,7 @@ package com.example.im.controller;
 import com.example.im.entity.Friend;
 import com.example.im.entity.Invitation;
 import com.example.im.entity.Label;
+import com.example.im.entity.User;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.FriendException;
 import com.example.im.exception.LabelException;
@@ -11,7 +12,10 @@ import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.service.InvitationService;
 import com.example.im.service.LabelService;
+import com.example.im.service.UserService;
+import com.example.im.util.BeanUtil;
 import com.example.im.util.ResultUtil;
+import com.example.im.util.StringUtil;
 import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +23,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author HuJun
@@ -38,6 +44,8 @@ public class InvitationController {
     private LabelService labelService;
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private UserService userService;
     @PostMapping
     public Result create(@Valid Invitation invitation, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -59,8 +67,32 @@ public class InvitationController {
     @GetMapping()
     public Result list(@RequestParam String userId){
         List<Invitation> invitationList = invitationService.findByUserId(userId);
-        List<InvitationResult> invitationResultList = DO2VO.convert(invitationList, userId);
-        return ResultUtil.success(invitationResultList);
+        List<InvitationResult> invitationResultList = new ArrayList<>();
+        List<InvitationResult> todoList = new ArrayList<>();
+        invitationList.stream().forEach(invitation -> {
+            InvitationResult invitationResult = new InvitationResult();
+            BeanUtil.copyProperties(invitation, invitationResult);
+            User user = null;
+            if (userId.equals(invitation.getSenderId())) {
+                user = userService.findById(invitation.getReceiverId());
+                invitationResult.setAvatar(user.getAvatar());
+                if (StringUtil.isNullOrEmpty(invitationResult.getRemark())) {
+                    invitationResult.setRemark(user.getName());
+                }
+                invitationResultList.add(invitationResult);
+            } else {
+                user = userService.findById(invitation.getSenderId());
+                invitationResult.setAvatar(user.getAvatar());
+                if (StringUtil.isNullOrEmpty(invitationResult.getRemark())) {
+                    invitationResult.setRemark(user.getName());
+                }
+                todoList.add(invitationResult);
+            }
+        });
+        Map<String, List<InvitationResult>> map = new HashMap<>(2);
+        map.put("invitationList", invitationResultList);
+        map.put("todoList", todoList);
+        return ResultUtil.success(map);
     }
 
     @GetMapping("/reject")

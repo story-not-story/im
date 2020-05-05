@@ -18,7 +18,7 @@ public interface GroupApplyDao extends JpaRepository<GroupApply, String> {
      * @param groupId
      * @return
      */
-    @Query(value = "select * from group_apply where group_id = :groupId and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
+    @Query(value = "select * from group_apply g where g.group_id = :groupId and g.gmt_create = (select max(gmt_create) from group_apply where user_id = g.user_id and group_id = g.group_id and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY))", nativeQuery = true)
     List<GroupApply> findByGroupId(@Param("groupId") String groupId);
 
     /**
@@ -26,7 +26,7 @@ public interface GroupApplyDao extends JpaRepository<GroupApply, String> {
      * @param userId
      * @return
      */
-    @Query(value = "select * from group_apply where user_id = :userId and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY)", nativeQuery = true)
+    @Query(value = "select * from group_apply g where g.user_id = :userId and g.gmt_create = (select max(gmt_create) from group_apply where user_id = g.user_id and group_id = g.group_id and gmt_create > date_sub(current_timestamp(),INTERVAL 30 DAY))", nativeQuery = true)
     List<GroupApply> findByUserId(@Param("userId") String userId);
 
     /**

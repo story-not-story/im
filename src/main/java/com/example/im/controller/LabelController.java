@@ -72,6 +72,16 @@ public class LabelController {
 
     @DeleteMapping
     public Result delete(@RequestParam Integer id){
+        Label label = labelService.findById(id);
+        String userId = label.getUserId();
+        List<Friend> friendList = friendService.findAll(userId).stream().filter(o -> {
+            if (userId.equals(o.getUserId())) {
+                return id.equals(o.getULabelId());
+            } else {
+                return id.equals(o.getFLabelId());
+            }
+        }).collect(Collectors.toList());
+        friendService.save(friendList);
         labelService.deleteById(id);
         return ResultUtil.success();
     }
@@ -86,7 +96,7 @@ public class LabelController {
     public Result list(@RequestParam String userId){
         List<Friend> friendList = friendService.findAll(userId);
         List<Label> labelList = labelService.findByUserId(userId);
-        List<FriendResult> defaultLabelList = new ArrayList<FriendResult>();
+        Set<FriendResult> defaultLabelSet = new HashSet<>();
         List<LabelResult> labelResultList = new ArrayList<>(labelList.size());
         List<FriendResult> friendResultList = friendList.stream().map(o -> DO2VO.convert(o, userId)).collect(Collectors.toList());
         LabelResult defaultLabel = new LabelResult();
@@ -107,7 +117,7 @@ public class LabelController {
                         @Override
                         public void accept(FriendResult friend) {
                             if (friend.getLabelId() == null) {
-                                defaultLabelList.add(friend);
+                                defaultLabelSet.add(friend);
                             } else if (label.getId().equals(friend.getLabelId())){
                                 friendList1.add(friend);
                             }
@@ -117,8 +127,8 @@ public class LabelController {
                     labelResultList.add(labelResult);
                 }
             });
-            if (defaultLabelList.size() > 0) {
-                defaultLabel.setFriendList(defaultLabelList);
+            if (defaultLabelSet.size() > 0) {
+                defaultLabel.setFriendList(defaultLabelSet.stream().collect(Collectors.toList()));
                 labelResultList.add(defaultLabel);
             }
         }

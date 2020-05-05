@@ -17,7 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class HttpAspect {
     private static final Logger logger = LoggerFactory.getLogger(HttpAspect.class);
 
-    @Pointcut("execution(public * school.wastesorting.controller.*.*(..))")
+    @Pointcut("execution(public * com.example.im.controller.*.*(..))")
     public void log(){}
 
     /**

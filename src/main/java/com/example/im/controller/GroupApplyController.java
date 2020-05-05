@@ -5,11 +5,13 @@ import com.example.im.entity.GroupApply;
 import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.FriendException;
+import com.example.im.result.GroupApplyResult;
 import com.example.im.result.Result;
 import com.example.im.service.GroupApplyService;
 import com.example.im.service.MemberService;
 import com.example.im.util.KeyUtil;
 import com.example.im.util.ResultUtil;
+import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.example.im.enums.MemberGrade.NORMAL;
 
@@ -53,21 +56,29 @@ public class GroupApplyController {
         memberService.findByUserId(userId).stream()
                 .filter(member -> !NORMAL.getCode().equals(member.getGrade()))
                 .forEach(member -> toDoList.addAll(applyService.findByGroupId(member.getGroupId())));
-        Map<String, List<GroupApply>> map = new HashMap<>(2);
-        map.put("applyList", applyList);
-        map.put("toDoList", toDoList);
+        List<GroupApplyResult> applyResultList = applyList.stream().map(o -> DO2VO.convert(o)).collect(Collectors.toList());
+        List<GroupApplyResult> toDoResultList = toDoList.stream().map(o -> DO2VO.convert(o)).collect(Collectors.toList());
+        Map<String, List<GroupApplyResult>> map = new HashMap<>(2);
+        map.put("applyList", applyResultList);
+        map.put("toDoList", toDoResultList);
         return ResultUtil.success(map);
+    }
+    @GetMapping("/detail")
+    public Result detail(@RequestParam String id) {
+        GroupApply apply = applyService.findById(id);
+        GroupApplyResult result = DO2VO.convert(apply);
+        return ResultUtil.success(result);
     }
 
     @GetMapping("/reject")
-    public Result reject(@RequestParam String applyId){
-        GroupApply apply = applyService.reject(applyId);
+    public Result reject(@RequestParam String id){
+        GroupApply apply = applyService.reject(id);
         return ResultUtil.success(apply);
     }
 
     @GetMapping("/accept")
-    public Result accept(@RequestParam String applyId){
-        GroupApply apply = applyService.accept(applyId);
+    public Result accept(@RequestParam String id){
+        GroupApply apply = applyService.accept(id);
         Member member = new Member();
         member.setId(KeyUtil.getUniqueKey());
         member.setGrade(NORMAL.getCode().byteValue());

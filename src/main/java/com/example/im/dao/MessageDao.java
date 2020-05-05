@@ -37,8 +37,8 @@ public interface MessageDao extends JpaRepository<Message, String> {
      * @param friendId
      * @return
      */
-    @Query(value = "select * from message where is_group = false and (receiver_id = ?1 and status in (0, 3) && sender_id = ?2 or receiver_id = ?2 && sender_id = ?1 and status in (0, 2)) and gmt_create > date_sub(current_timestamp(),INTERVAL 6 MONTH) order by ?#{#pageable}",
-            countQuery = "select count(*) from message where is_group = false and (receiver_id = ?1 and status in (0, 3) && sender_id = ?2 or receiver_id = ?2 && sender_id = ?1 and status in (0, 2)) and status = 0 and gmt_create > date_sub(current_timestamp(),INTERVAL 6 MONTH)",
+    @Query(value = "select * from message where is_group = false and (receiver_id = ?1 and status in (0, 3) and sender_id = ?2 or receiver_id = ?2 and sender_id = ?1 and status in (0, 2)) and gmt_create > date_sub(current_timestamp(),INTERVAL 6 MONTH) order by ?#{#pageable}",
+            countQuery = "select count(*) from message where is_group = false and (receiver_id = ?1 and status in (0, 3) and sender_id = ?2 or receiver_id = ?2 and sender_id = ?1 and status in (0, 2)) and status = 0 and gmt_create > date_sub(current_timestamp(),INTERVAL 6 MONTH)",
             nativeQuery = true)
     List<Message> findByFriend(String userId, String friendId, Pageable pageable);
     @Query(value = "select * from message where (is_group = false and (receiver_id = ?1 and status in (0, 3) or sender_id = ?1 and status in (0, 2)) or is_group = true and sender_id = ?1 and status in (0, 2)) and content like %?2% and gmt_create > date_sub(current_timestamp(),INTERVAL 6 MONTH)", nativeQuery = true)

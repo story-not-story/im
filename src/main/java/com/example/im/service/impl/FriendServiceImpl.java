@@ -44,6 +44,12 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
+    public List<Friend> save(List<Friend> friendList) {
+        friendList.forEach(o -> o.setId(KeyUtil.getUniqueKey()));
+        return friendDao.saveAll(friendList);
+    }
+
+    @Override
     @Transactional(rollbackFor = {UserException.class, FriendException.class})
     public void remove(String userId, String friendId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){

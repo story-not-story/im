@@ -40,7 +40,7 @@ public class GroupController {
     @Autowired
     private FriendService friendService;
     @PostMapping
-    public Result create(@RequestParam String userId, @RequestParam String name, @RequestParam String signature, @RequestParam(value = "userIdList[]") List<String> userIdList){
+    public Result create(@RequestParam String userId, @RequestParam(required = false) String name, @RequestParam(required = false) String signature, @RequestParam(value = "userIdList[]", required = false) List<String> userIdList){
         Group group = new Group();
         group.setId(KeyUtil.getUniqueKey());
         group.setName(name);
@@ -52,14 +52,16 @@ public class GroupController {
         member.setUserId(userId);
         member.setGrade(MemberGrade.OWNER.getCode());
         Member memberResult = memberService.add(member);
-        userIdList.stream().filter(o -> friendService.isFriend(userId, o)).forEach(o -> {
-            Member m = new Member();
-            m.setId(KeyUtil.getUniqueKey());
-            m.setGroupId(groupResult.getId());
-            m.setUserId(o);
-            m.setGrade(MemberGrade.NORMAL.getCode());
-            Member mR = memberService.add(m);
-        });
+        if (!CollectionUtils.isEmpty(userIdList)) {
+            userIdList.stream().filter(o -> friendService.isFriend(userId, o)).forEach(o -> {
+                Member m = new Member();
+                m.setId(KeyUtil.getUniqueKey());
+                m.setGroupId(groupResult.getId());
+                m.setUserId(o);
+                m.setGrade(MemberGrade.NORMAL.getCode());
+                Member mR = memberService.add(m);
+            });
+        }
         Map<String, String> map = new HashMap<>(2);
         map.put("groupId", groupResult.getId());
         map.put("ownerId", memberResult.getUserId());

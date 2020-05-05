@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `group`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `group` (
   `id` varchar(32) NOT NULL,
-  `name` varchar(32) NOT NULL COMMENT '名称',
+  `name` varchar(32) DEFAULT NULL COMMENT '名称',
   `signature` varchar(32) DEFAULT NULL COMMENT '群签名',
   `notice` varchar(64) DEFAULT NULL COMMENT '群公告',
   `avatar` varchar(64) DEFAULT NULL COMMENT '头像',

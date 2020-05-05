@@ -1,7 +1,6 @@
 package com.example.im.service;
 
 import com.example.im.entity.Friend;
-import com.example.im.entity.Group;
 
 import java.util.List;
 
@@ -16,6 +15,13 @@ public interface FriendService {
      * @return
      */
     Friend add(Friend friend);
+
+    /**
+     * 添加好友
+     * @param friend
+     * @return
+     */
+    List<Friend> save(List<Friend> friend);
 
     /**
      * 删除好友
@@ -79,5 +85,5 @@ public interface FriendService {
      * @param friendId
      * @return
      */
-    public Friend findOne(String userId, String friendId);
+    Friend findOne(String userId, String friendId);
 }

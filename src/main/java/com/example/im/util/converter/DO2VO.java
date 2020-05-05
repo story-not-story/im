@@ -1,10 +1,7 @@
 package com.example.im.util.converter;
 
 import com.example.im.entity.*;
-import com.example.im.result.FriendResult;
-import com.example.im.result.InvitationResult;
-import com.example.im.result.MemberResult;
-import com.example.im.result.MessageResult;
+import com.example.im.result.*;
 import com.example.im.service.FriendService;
 import com.example.im.service.GroupService;
 import com.example.im.service.MemberService;
@@ -70,6 +67,15 @@ public class DO2VO {
             friendResult.setRemark(user.getName());
         }
         return friendResult;
+    }
+
+    public static GroupApplyResult convert(GroupApply groupApply) {
+        GroupApplyResult groupApplyResult = new GroupApplyResult();
+        BeanUtil.copyProperties(groupApply, groupApplyResult);
+        Group group = groupService.findById(groupApply.getGroupId());
+        String avatar = group.getAvatar();
+        groupApplyResult.setAvatar(avatar);
+        return groupApplyResult;
     }
 
     public static List<InvitationResult> convert(List<Invitation> invitationList, String userId) {
