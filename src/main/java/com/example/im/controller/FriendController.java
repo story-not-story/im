@@ -9,6 +9,7 @@ import com.example.im.service.FriendService;
 import com.example.im.util.CharUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
  * @author HuJun
  * @date 2020/3/23 2:53 下午
  */
+@Api(tags = "好友联系接口")
 @RestController
 @RequestMapping("/friend")
 @Slf4j
@@ -29,6 +31,8 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
+    @ApiOperation(value = "查找好友列表", notes = "按字母排序", httpMethod = "GET")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping("/list")
     public Result list(@RequestParam String userId){
         List<Friend> friendList = friendService.findAll(userId);
@@ -54,6 +58,13 @@ public class FriendController {
         return ResultUtil.success(letterMap);
     }
 
+    @ApiOperation(value = "判断是否是好友", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true)
+            }
+    )
     @GetMapping("/isFriend")
     public Result isFriend(@RequestParam String userId, @RequestParam String friendId) {
         Map<String, Boolean> map = new HashMap<>(1);
@@ -61,6 +72,13 @@ public class FriendController {
         return ResultUtil.success(map);
     }
 
+    @ApiOperation(value = "模糊匹配搜索内容的好友列表", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "text", value = "搜索内容", defaultValue = "jojo", dataTypeClass = String.class, required = true)
+            }
+    )
     @GetMapping("/search")
     public Result search(@RequestParam String userId, @RequestParam String text) {
         List<Friend> friendList = friendService.findAll(userId);
@@ -78,30 +96,67 @@ public class FriendController {
         return ResultUtil.success(resultList);
     }
 
+    @ApiOperation(value = "删除好友", httpMethod = "DELETE")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true)
+            }
+    )
     @DeleteMapping
     public Result delete(@RequestParam String userId, @RequestParam String friendId){
         friendService.remove(userId, friendId);
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "拉黑好友", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true)
+            }
+    )
     @GetMapping("/blacklist")
     public Result blacklist(@RequestParam String userId, @RequestParam String friendId){
         Friend friend = friendService.blacklist(userId, friendId);
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "解除拉黑好友", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true)
+            }
+    )
     @GetMapping("/unblacklist")
     public Result unblacklist(@RequestParam String userId, @RequestParam String friendId){
         Friend friend = friendService.unblacklist(userId, friendId);
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "移动好友分组", httpMethod = "PUT")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "labelId", value = "新分组号", defaultValue = "1", dataTypeClass = Integer.class, required = true, allowEmptyValue = true)
+            }
+    )
     @PutMapping("/move")
     public Result move(@RequestParam String userId, @RequestParam String friendId, @RequestParam Integer labelId){
         friendService.move(userId, friendId, labelId);
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "修改好友备注", httpMethod = "PUT")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "remark", value = "备注", defaultValue = "玲珑", dataTypeClass = String.class, required = true)
+            }
+    )
     @PutMapping("/remark")
     public Result remark(@RequestParam String userId, @RequestParam String friendId, @RequestParam String remark){
         friendService.remark(userId, friendId, remark);

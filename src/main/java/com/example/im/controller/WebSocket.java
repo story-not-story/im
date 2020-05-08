@@ -1,6 +1,5 @@
 package com.example.im.controller;
 
-
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
@@ -25,6 +24,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author HuJun
  * @date 2020/3/21 8:42 下午
@@ -56,6 +56,7 @@ public class WebSocket {
     public void setMessageService(MessageService messageService){
         WebSocket.messageService = messageService;
     }
+
     @OnOpen
     public void onOpen(Session session,@PathParam("userId") String userId){
         this.session = session;
@@ -63,11 +64,19 @@ public class WebSocket {
         webSocketMap.put(userId, this);
         log.info("一个新的链接，现在连接数：{}", webSocketMap.size());
     }
+
     @OnClose
     public void onClose(){
         webSocketMap.remove(this.userId);
         log.info("断开一个链接，现在连接数：{}", webSocketMap.size());
     }
+
+    @OnError
+    public void onError(Session session, Throwable error){
+        log.info("发生错误");
+        error.printStackTrace();
+    }
+
     @OnMessage
     public void onMessage(String message){
         if (HEARTBEAT_REQ.equals(JsonUtil.getValue(message, "content"))) {
@@ -109,11 +118,7 @@ public class WebSocket {
             sendPointMessage(msg.getReceiverId(), content, msg.getSenderId());
         }
     }
-    @OnError
-    public void onError(Session session, Throwable error){
-        log.info("发生错误");
-        error.printStackTrace();
-    }
+
      public void sendGroupMessage(String groupId, String message){
          List<Member> memberList = memberService.findByGroupId(groupId);
          for (Member member:
@@ -132,7 +137,6 @@ public class WebSocket {
 
     public void sendPointMessage(String userId, String message, String senderId){
         try {
-
             if (webSocketMap.get(userId) != null) {
                 webSocketMap.get(userId).session.getBasicRemote().sendText(message);
                 if (senderId != null) {

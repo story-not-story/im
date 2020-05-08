@@ -8,11 +8,14 @@ import com.example.im.enums.MessageStatus;
 import com.example.im.exception.MessageException;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
+import com.example.im.util.JsonUtil;
+import com.example.im.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,13 +40,17 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> findByGroupId(String groupId, Pageable pageable) {
-        return messageDao.findByGroupId(groupId, pageable);
+    public List<Message> findByGroupId(String userId, String groupId, Pageable pageable) {
+        return messageDao.findByGroupId(groupId, pageable).stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findByFriend(String userId, String friendId, Pageable pageable) {
-        return messageDao.findByFriend(userId, friendId, pageable);
+        return messageDao.findByFriend(userId, friendId, pageable).stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).collect(Collectors.toList());
     }
 
     @Override
@@ -74,29 +81,30 @@ public class MessageServiceImpl implements MessageService {
     public Message delete(String id, String userId) {
         Message message = findById(id);
         if (message == null){
-            log.error("【撤回消息】该消息记录不存在");
+            log.error("【删除消息】该消息记录不存在");
             throw new MessageException(ErrorCode.MESSAGE_NOT_EXISTS);
         }
-        if (userId.equals(message.getSenderId())) {
-            if (MessageStatus.NORMAL.getCode().equals(message.getStatus())) {
-                message.setStatus(MessageStatus.VISIBLE_R.getCode());
-            } else if (MessageStatus.VISIBLE_S.getCode().equals(message.getStatus())){
-                message.setStatus(MessageStatus.CANCELED.getCode());
-            }
+        String invisible = null;
+        if (StringUtil.isNullOrEmpty(message.getInvisible())) {
+            List<String> userIdList = new ArrayList<>();
+            userIdList.add(userId);
+            invisible = JsonUtil.toJson(userIdList);
         } else {
-            if (MessageStatus.NORMAL.getCode().equals(message.getStatus())) {
-                message.setStatus(MessageStatus.VISIBLE_S.getCode());
-            } else if (MessageStatus.VISIBLE_R.getCode().equals(message.getStatus())){
-                message.setStatus(MessageStatus.CANCELED.getCode());
-            }
+            List<String> userIdList = JsonUtil.toList(message.getInvisible(), String.class);
+            userIdList.add(userId);
+            invisible = JsonUtil.toJson(userIdList);
         }
+        message.setInvisible(invisible);
+        message.setStatus(MessageStatus.DELETED.getCode());
         messageDao.save(message);
         return message;
     }
 
     @Override
     public List<Message> findByContentLike(String userId, String content) {
-        return messageDao.findByContentLike(userId, content);
+        return messageDao.findByContentLike(userId, content).stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).collect(Collectors.toList());
     }
 
 }

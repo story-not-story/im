@@ -17,13 +17,9 @@ public enum MessageStatus implements CodeEnum{
      */
     CANCELED(1, "已撤回"),
     /**
-     * 消息只对senderId可见
+     * 消息已删除，不可见用户列表见invisible列
      */
-    VISIBLE_S(2, "消息只对senderId可见"),
-    /**
-     * 消息只对receiverId可见
-     */
-    VISIBLE_R(3, "消息只对receiverId可见");
+    DELETED(2, "已删除");
     private Byte code;
     private String msg;
 

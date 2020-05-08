@@ -12,6 +12,10 @@ import com.example.im.service.LabelService;
 import com.example.im.service.UserService;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
  * @author HuJun
  * @date 2020/3/26 8:12 下午
  */
+@Api(tags = "分组接口")
 @RestController
 @RequestMapping("/label")
 @Slf4j
@@ -35,6 +40,13 @@ public class LabelController {
     private FriendService friendService;
     @Autowired
     private UserService userService;
+    @ApiOperation(value = "创建分组 ", httpMethod = "POST")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "name", value = "分组名称", defaultValue = "大学", dataTypeClass = String.class, required = true)
+            }
+    )
     @PostMapping
     public Result create(@RequestParam String userId, @RequestParam String name){
         List<Label> labelList = labelService.findByUserId(userId);
@@ -54,6 +66,13 @@ public class LabelController {
         return ResultUtil.success(map);
     }
 
+    @ApiOperation(value = "修改分组", httpMethod = "PUT")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "id", value = "分组id", defaultValue = "1", dataTypeClass = Integer.class, required = true),
+                    @ApiImplicitParam(name = "name", value = "分组名称", defaultValue = "老师", dataTypeClass = String.class, required = true)
+            }
+    )
     @PutMapping
     public Result update(@RequestParam Integer id, @RequestParam String name){
         Label label = labelService.findById(id);
@@ -70,6 +89,8 @@ public class LabelController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "删除分组", httpMethod = "DELETE")
+    @ApiImplicitParam(name = "id", value = "分组id", defaultValue = "1", dataTypeClass = Integer.class, required = true)
     @DeleteMapping
     public Result delete(@RequestParam Integer id){
         Label label = labelService.findById(id);
@@ -86,12 +107,16 @@ public class LabelController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "分组列表", httpMethod = "GET")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping
     public Result findAll(@RequestParam String userId){
         List<Label> labelList = labelService.findByUserId(userId);
         return ResultUtil.success(labelList);
     }
 
+    @ApiOperation(value = "分组列表（含好友）", httpMethod = "GET")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping("/friendlist")
     public Result list(@RequestParam String userId){
         List<Friend> friendList = friendService.findAll(userId);

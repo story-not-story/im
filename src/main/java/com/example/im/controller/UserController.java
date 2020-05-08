@@ -10,6 +10,10 @@ import com.example.im.result.Result;
 import com.example.im.service.LoginService;
 import com.example.im.service.UserService;
 import com.example.im.util.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,7 @@ import java.util.regex.Pattern;
  * @author HuJun
  * @date 2020/3/21 8:08 下午
  */
+@Api(tags = "用户接口")
 @RestController
 @RequestMapping("/")
 @Slf4j
@@ -42,6 +47,8 @@ public class UserController {
     private StringRedisTemplate redisTemplate;
     @Autowired
     private LoginService loginService;
+    @ApiOperation(value = "注册", httpMethod = "POST")
+    @ApiImplicitParam(name = "registerForm", value = "注册具体参数", dataTypeClass = RegisterForm.class, required = true)
     @PostMapping("/register")
     public Result register(@Valid RegisterForm registerForm, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -59,6 +66,8 @@ public class UserController {
         return ResultUtil.success(map);
     }
 
+    @ApiOperation(value = "登录", httpMethod = "POST")
+    @ApiImplicitParam(name = "loginForm", value = "登录具体参数", dataTypeClass = LoginForm.class, required = true)
     @PostMapping("/login")
     public Result login(@Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response){
         if (bindingResult.hasErrors()){
@@ -86,6 +95,7 @@ public class UserController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "登出", httpMethod = "GET")
     @GetMapping("/logout")
     public Result logout(HttpServletRequest request, HttpServletResponse response){
         Cookie cookie = CookieUtil.get(request, CookieUtil.TOKEN);
@@ -101,6 +111,8 @@ public class UserController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "显示用户信息", httpMethod = "GET")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping("/userinfo")
     public Result userinfo(@RequestParam String userId){
         User user = userService.findById(userId);
@@ -108,6 +120,8 @@ public class UserController {
         return ResultUtil.success(user);
     }
 
+    @ApiOperation(value = "找人", httpMethod = "GET")
+    @ApiImplicitParam(name = "text", value = "搜索内容", defaultValue = "jojo", dataTypeClass = String.class, required = true)
     @GetMapping("/list")
     public Result list(@RequestParam String text){
         if (Pattern.matches("\\d+", text)) {
@@ -125,6 +139,8 @@ public class UserController {
         return ResultUtil.success(userList);
     }
 
+    @ApiOperation(value = "修改用户信息", httpMethod = "PUT")
+    @ApiImplicitParam(name = "user", value = "用户信息", dataTypeClass = User.class, required = true)
     @PutMapping("/userinfo")
     public Result userinfoUpdate(@Valid User user, BindingResult bindingResult){
         if (bindingResult.hasErrors()){

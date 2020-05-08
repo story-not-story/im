@@ -22,7 +22,7 @@ public interface MessageService {
      * @param groupId
      * @return
      */
-    List<Message> findByGroupId(String groupId, Pageable pageable);
+    List<Message> findByGroupId(String userId, String groupId, Pageable pageable);
 
     /**
      * 根据好友关系查找消息

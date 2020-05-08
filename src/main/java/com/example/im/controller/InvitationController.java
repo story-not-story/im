@@ -17,6 +17,10 @@ import com.example.im.util.BeanUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.StringUtil;
 import com.example.im.util.converter.DO2VO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
  * @author HuJun
  * @date 2020/3/23 4:08 下午
  */
+@Api(tags = "加好友申请接口")
 @RestController
 @Slf4j
 @RequestMapping("/invite/friend")
@@ -46,6 +51,9 @@ public class InvitationController {
     private FriendService friendService;
     @Autowired
     private UserService userService;
+
+    @ApiOperation(value = "创建加好友申请", httpMethod = "POST")
+    @ApiImplicitParam(name = "invitation", value = "加好友申请具体参数", dataTypeClass = Invitation.class, required = true)
     @PostMapping
     public Result create(@Valid Invitation invitation, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -57,6 +65,14 @@ public class InvitationController {
         map.put("id", invitationResult.getId());
         return ResultUtil.success(map);
     }
+
+    @ApiOperation(value = "加好友申请详情", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "id", value = "加好友申请详情id", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
+            }
+    )
     @GetMapping("/detail")
     public Result detail(@RequestParam String id, @RequestParam String userId){
         Invitation invitation = invitationService.findById(id);
@@ -64,6 +80,8 @@ public class InvitationController {
         return ResultUtil.success(invitationResult);
     }
 
+    @ApiOperation(value = "加好友申请列表", httpMethod = "GET", notes = "我加别人、别人加我的好友申请")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping()
     public Result list(@RequestParam String userId){
         List<Invitation> invitationList = invitationService.findByUserId(userId);
@@ -95,12 +113,16 @@ public class InvitationController {
         return ResultUtil.success(map);
     }
 
+    @ApiOperation(value = "拒绝加好友申请", httpMethod = "GET")
+    @ApiImplicitParam(name = "id", value = "加好友申请ID",defaultValue = "1588590953614706732", dataTypeClass = String.class, required = true)
     @GetMapping("/reject")
     public Result reject(@RequestParam String id){
         Invitation invitation = invitationService.reject(id);
         return ResultUtil.success(invitation);
     }
 
+    @ApiOperation(value = "同意加好友申请", httpMethod = "GET")
+    @ApiImplicitParam(name = "id", value = "加好友申请ID",defaultValue = "1588590953614706732", dataTypeClass = String.class, required = true)
     @GetMapping("/accept")
     public Result accept(@RequestParam String id){
         Invitation invitation = invitationService.accept(id);

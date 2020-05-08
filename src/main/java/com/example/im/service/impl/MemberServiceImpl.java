@@ -29,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
     public void remove(String groupId, String userId) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){
-            log.error("【退出群成员】该群没有该成员");
+            log.error("【删除群成员】该群没有该成员");
             throw new GroupException(ErrorCode.MEMBER_NOT_EXISTS);
         }
         memberDao.deleteById(member.getId());
@@ -49,7 +49,7 @@ public class MemberServiceImpl implements MemberService {
     public Member updateName(String groupId, String userId, String name) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){
-            log.error("【退出群成员】该群没有该成员");
+            log.error("【更改群昵称】该群没有该成员");
             throw new GroupException(ErrorCode.MEMBER_NOT_EXISTS);
         }
         member.setName(name);
@@ -60,7 +60,7 @@ public class MemberServiceImpl implements MemberService {
     public Member updateGrade(String groupId, String userId, Byte grade) {
         Member member = memberDao.find(groupId, userId);
         if (member == null){
-            log.error("【退出群成员】该群没有该成员");
+            log.error("【更改群成员等级】该群没有该成员");
             throw new GroupException(ErrorCode.MEMBER_NOT_EXISTS);
         }
         member.setGrade(grade);

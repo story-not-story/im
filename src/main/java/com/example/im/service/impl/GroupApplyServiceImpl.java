@@ -50,7 +50,7 @@ public class GroupApplyServiceImpl implements GroupApplyService {
     public GroupApply accept(String id) {
         GroupApply apply = findById(id);
         if (apply.getIsAccepted() != null){
-            log.error("【申请加群】该加群申请已处理");
+            log.error("【同意加群申请】该加群申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         apply.setIsAccepted(true);
@@ -61,7 +61,7 @@ public class GroupApplyServiceImpl implements GroupApplyService {
     public GroupApply reject(String id) {
         GroupApply apply = findById(id);
         if (apply.getIsAccepted() != null){
-            log.error("【拒绝好友添加申请】该加群申请已处理");
+            log.error("【拒绝加群申请】该加群申请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         apply.setIsAccepted(false);

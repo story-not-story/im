@@ -29,5 +29,6 @@ public class Message {
     private String toUserId;
     private Timestamp finishTime;
     private String content;
+    private String invisible;
     private Timestamp gmtCreate;
 }

@@ -10,6 +10,9 @@ import com.example.im.service.GroupInvitationService;
 import com.example.im.service.MemberService;
 import com.example.im.util.KeyUtil;
 import com.example.im.util.ResultUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -26,6 +29,7 @@ import static com.example.im.enums.MemberGrade.NORMAL;
  * @author HuJun
  * @date 2020/3/23 4:08 下午
  */
+@Api(tags = "邀请好友进群接口")
 @RestController
 @Slf4j
 @RequestMapping("/invite/group")
@@ -35,6 +39,8 @@ public class GroupInvitationController {
     private GroupInvitationService invitationService;
     @Autowired
     private MemberService memberService;
+    @ApiOperation(value = "创建拉好友进群的邀请", httpMethod = "POST")
+    @ApiImplicitParam(name = "invitation", value = "群邀请具体参数", dataTypeClass = GroupInvitation.class, required = true)
     @PostMapping
     public Result create(@Valid GroupInvitation invitation, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -46,21 +52,28 @@ public class GroupInvitationController {
         map.put("id", invitationResult.getId());
         return ResultUtil.success(map);
     }
+
+    @ApiOperation(value = "群邀请列表", httpMethod = "GET")
+    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
     @GetMapping("/list")
     public Result list(@RequestParam String userId){
         List<GroupInvitation> invitationList = invitationService.findByReceiverId(userId);
         return ResultUtil.success(invitationList);
     }
 
+    @ApiOperation(value = "拒绝群邀请", httpMethod = "GET")
+    @ApiImplicitParam(name = "id", value = "群邀请ID",defaultValue = "1588590953614706732", dataTypeClass = String.class, required = true)
     @GetMapping("/reject")
-    public Result reject(@RequestParam String invitationId){
-        GroupInvitation invitation = invitationService.reject(invitationId);
+    public Result reject(@RequestParam String id){
+        GroupInvitation invitation = invitationService.reject(id);
         return ResultUtil.success(invitation);
     }
 
+    @ApiOperation(value = "同意群邀请", httpMethod = "GET")
+    @ApiImplicitParam(name = "id", value = "群邀请ID",defaultValue = "1588590953614706732", dataTypeClass = String.class, required = true)
     @GetMapping("/accept")
-    public Result accept(@RequestParam String invitationId){
-        GroupInvitation invitation = invitationService.accept(invitationId);
+    public Result accept(@RequestParam String id){
+        GroupInvitation invitation = invitationService.accept(id);
         Member member = new Member();
         member.setId(KeyUtil.getUniqueKey());
         member.setGrade(NORMAL.getCode().byteValue());
