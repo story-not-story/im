@@ -2,7 +2,6 @@ package com.example.im.controller;
 
 import com.example.im.entity.Friend;
 import com.example.im.entity.Invitation;
-import com.example.im.entity.Label;
 import com.example.im.entity.User;
 import com.example.im.enums.ErrorCode;
 import com.example.im.exception.FriendException;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author HuJun
@@ -53,12 +51,15 @@ public class InvitationController {
     private UserService userService;
 
     @ApiOperation(value = "创建加好友申请", httpMethod = "POST")
-    @ApiImplicitParam(name = "invitation", value = "加好友申请具体参数", dataTypeClass = Invitation.class, required = true)
     @PostMapping
     public Result create(@Valid Invitation invitation, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
-            log.error("【用户注册】参数错误");
+            log.error("【创建加好友申请】参数错误");
             throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
+        if (friendService.isFriend(invitation.getSenderId(), invitation.getReceiverId())) {
+            log.error("【创建加好友申请】已经是好友");
+            throw new FriendException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
         Invitation invitationResult = invitationService.create(invitation);
         Map<String, String> map = new HashMap<>(1);
@@ -118,7 +119,7 @@ public class InvitationController {
     @GetMapping("/reject")
     public Result reject(@RequestParam String id){
         Invitation invitation = invitationService.reject(id);
-        return ResultUtil.success(invitation);
+        return ResultUtil.success();
     }
 
     @ApiOperation(value = "同意加好友申请", httpMethod = "GET")

@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @DynamicUpdate
 @DynamicInsert
 public class Invitation {
-    @ApiModelProperty(name = "id", value = "加好友申请id", dataType = "String", example = "1588590953614706732")
+    @ApiModelProperty(name = "id", value = "加好友申请id", dataType = "String")
     @Id
     private String id;
     @ApiModelProperty(name = "senderId", value = "发送者id", dataType = "String", example = "1586969516508397974", required = true)
@@ -33,7 +33,7 @@ public class Invitation {
     private Integer labelId;
     @ApiModelProperty(name = "message", value = "验证信息", dataType = "String", example = "我是南邮学生")
     private String message;
-    @ApiModelProperty(name = "isAccepted", value = "是否同意该加群申请", dataType = "Boolean", example = "true")
+    @ApiModelProperty(name = "isAccepted", value = "是否同意该加群申请", dataType = "Boolean")
     private Boolean isAccepted;
     @ApiModelProperty(name = "remark", value = "备注", dataType = "String", example = "玲珑")
     private String remark;

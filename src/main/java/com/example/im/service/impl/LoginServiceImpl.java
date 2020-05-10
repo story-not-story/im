@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author HuJun
@@ -33,7 +32,7 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public boolean isLogin(String userId) {
         Login login = loginDao.findTopByUserId(userId);
-        return login.getStatus();
+        return login != null && login.getStatus();
     }
 
     public String getIpAddr(HttpServletRequest request) {

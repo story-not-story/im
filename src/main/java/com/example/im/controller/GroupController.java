@@ -5,7 +5,6 @@ import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MemberGrade;
 import com.example.im.exception.GroupException;
-import com.example.im.result.FriendResult;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.service.GroupService;
@@ -22,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,7 +46,7 @@ public class GroupController {
                     @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
                     @ApiImplicitParam(name = "name", value = "群聊名称", defaultValue = "考研群", dataTypeClass = String.class),
                     @ApiImplicitParam(name = "userId", value = "群聊签名", defaultValue = "好好学习，天天向上", dataTypeClass = String.class),
-                    @ApiImplicitParam(name = "userIdList", value = "群聊成员", dataTypeClass = List.class)
+                    @ApiImplicitParam(name = "userIdList[]", value = "群聊成员", dataTypeClass = String.class, allowMultiple = true)
             }
     )
     @PostMapping
@@ -139,29 +135,26 @@ public class GroupController {
         List<Group> manage = new ArrayList<>();
         List<Group> join = new ArrayList<>();
         List<Member> memberList = memberService.findByUserId(userId);
-        List<Group> groupList = memberList.stream().map(m -> {
+        memberList.stream().forEach(o -> {
             try {
-                return groupService.findById(m.getGroupId());
+                Group group = groupService.findById(o.getGroupId());
+                MemberGrade grade = Code2Enum.convert(o.getGrade(), MemberGrade.class);
+                switch (grade){
+                    case NORMAL:
+                        join.add(group);
+                        break;
+                    case MANAGER:
+                        manage.add(group);
+                        break;
+                    case OWNER:
+                        create.add(group);
+                        break;
+                    default:
+                }
             } catch (GroupException e) {
-                return null;
+                log.error("【查找群聊列表】群不存在");
             }
-        }).collect(Collectors.toList());
-        for (int i = 0; i < memberList.size(); i++) {
-            MemberGrade grade = Code2Enum.convert(memberList.get(i).getGrade(), MemberGrade.class);
-            Group group = groupList.get(i);
-            switch (grade){
-                case NORMAL:
-                    join.add(group);
-                    break;
-                case MANAGER:
-                    manage.add(group);
-                    break;
-                case OWNER:
-                    create.add(group);
-                    break;
-                default:
-            }
-        }
+        });
         map.put("我创建的群聊", create);
         map.put("我管理的群聊", manage);
         map.put("我加入的群聊", join);
@@ -188,7 +181,7 @@ public class GroupController {
             } catch (GroupException e) {
                 return null;
             }
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         if (Pattern.matches("\\d+", text)) {
             List<Group> resultList = groupList.stream().filter(o -> text.equals(o.getId())).collect(Collectors.toList());
             if (resultList.size() == 1) {

@@ -9,10 +9,12 @@ import com.example.im.form.RegisterForm;
 import com.example.im.result.Result;
 import com.example.im.service.LoginService;
 import com.example.im.service.UserService;
-import com.example.im.util.*;
+import com.example.im.util.BeanUtil;
+import com.example.im.util.CookieUtil;
+import com.example.im.util.KeyUtil;
+import com.example.im.util.ResultUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -48,7 +50,6 @@ public class UserController {
     @Autowired
     private LoginService loginService;
     @ApiOperation(value = "注册", httpMethod = "POST")
-    @ApiImplicitParam(name = "registerForm", value = "注册具体参数", dataTypeClass = RegisterForm.class, required = true)
     @PostMapping("/register")
     public Result register(@Valid RegisterForm registerForm, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -67,7 +68,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "登录", httpMethod = "POST")
-    @ApiImplicitParam(name = "loginForm", value = "登录具体参数", dataTypeClass = LoginForm.class, required = true)
     @PostMapping("/login")
     public Result login(@Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response){
         if (bindingResult.hasErrors()){
@@ -140,11 +140,10 @@ public class UserController {
     }
 
     @ApiOperation(value = "修改用户信息", httpMethod = "PUT")
-    @ApiImplicitParam(name = "user", value = "用户信息", dataTypeClass = User.class, required = true)
     @PutMapping("/userinfo")
     public Result userinfoUpdate(@Valid User user, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
-            log.error("【用户注册】参数错误");
+            log.error("【修改用户信息】参数错误");
             throw new UserException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
         }
         User result = userService.findById(user.getId());

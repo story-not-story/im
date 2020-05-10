@@ -1,15 +1,18 @@
 package com.example.im.controller;
 
 import com.example.im.entity.Friend;
-import com.example.im.entity.Group;
 import com.example.im.enums.ErrorCode;
+import com.example.im.exception.FriendException;
 import com.example.im.result.FriendResult;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.util.CharUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -67,8 +70,14 @@ public class FriendController {
     )
     @GetMapping("/isFriend")
     public Result isFriend(@RequestParam String userId, @RequestParam String friendId) {
-        Map<String, Boolean> map = new HashMap<>(1);
-        map.put("isFriend", friendService.isFriend(userId, friendId));
+        Map<String, Object> map = new HashMap<>(1);
+        try {
+            Friend friend = friendService.findOne(userId, friendId);
+            map.put("isFriend", true);
+            map.put("name", DO2VO.convert(friend, userId).getRemark());
+        } catch (FriendException e) {
+            map.put("isFriend", false);
+        }
         return ResultUtil.success(map);
     }
 

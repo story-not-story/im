@@ -67,13 +67,13 @@ public enum ErrorCode {
      */
     LABEL_MUST_DIFF(14, "分组必须不同"),
     /**
-     * 邀请不存在或者已过期
+     * 邀请（申请）不存在或者已过期
      */
-    INVITATION_NOT_FOUND(15, "邀请不存在或者已过期"),
+    INVITATION_NOT_FOUND(15, "邀请（申请）不存在或者已过期"),
     /**
-     * 已处理好友添加申请
+     * 已处理邀请（申请）
      */
-    INVITATION_ALREADY_HANDLE(16, "已处理好友添加申请"),
+    INVITATION_ALREADY_HANDLE(16, "已处理邀请（申请）"),
     /**
      * 修改前后好友备注不能相同
      */
@@ -82,6 +82,10 @@ public enum ErrorCode {
      * 该群成员不存在
      */
     MEMBER_NOT_EXISTS(18, "该群成员不存在"),
+    /**
+     * 该群成员已存在
+     */
+    MEMBER_ALREADY_EXISTS(18, "该群成员已存在"),
     /**
      * 该消息记录不存在
      */

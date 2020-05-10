@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @DynamicUpdate
 @DynamicInsert
 public class GroupInvitation {
-    @ApiModelProperty(name = "id", value = "拉好友进群的邀请id", dataType = "String", example = "1588590953614706732")
+    @ApiModelProperty(name = "id", value = "拉好友进群的邀请id", dataType = "String")
     @Id
     private String id;
     @ApiModelProperty(name = "senderId", value = "发送者id", dataType = "String", example = "1586969516508397974", required = true)
@@ -32,6 +32,6 @@ public class GroupInvitation {
     @ApiModelProperty(name = "groupId", value = "群聊id", dataType = "String", example = "1586487898500340241", required = true)
     @NotNull
     private String groupId;
-    @ApiModelProperty(name = "isAccepted", value = "是否同意邀请", dataType = "Boolean", example = "true")
+    @ApiModelProperty(name = "isAccepted", value = "是否同意邀请", dataType = "Boolean")
     private Boolean isAccepted;
 }

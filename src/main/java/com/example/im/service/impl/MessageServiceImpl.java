@@ -41,14 +41,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> findByGroupId(String userId, String groupId, Pageable pageable) {
-        return messageDao.findByGroupId(groupId, pageable).stream().filter(o ->
+        return messageDao.findByGroupId(groupId, pageable).getContent().stream().filter(o ->
                 MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
         ).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findByFriend(String userId, String friendId, Pageable pageable) {
-        return messageDao.findByFriend(userId, friendId, pageable).stream().filter(o ->
+        return messageDao.findByFriend(userId, friendId, pageable).getContent().stream().filter(o ->
                 MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
         ).collect(Collectors.toList());
     }

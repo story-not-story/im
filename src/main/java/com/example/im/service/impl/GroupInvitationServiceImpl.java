@@ -12,7 +12,6 @@ import com.example.im.util.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.jvm.hotspot.debugger.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +49,7 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     public GroupInvitation accept(String id) {
         GroupInvitation invitation = findById(id);
         if (invitation.getIsAccepted() != null){
-            log.error("【接受好友添加申请】该好友添加申请已处理");
+            log.error("【接受群邀请】该群邀请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         invitation.setIsAccepted(true);
@@ -61,7 +60,7 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     public GroupInvitation reject(String id) {
         GroupInvitation invitation = findById(id);
         if (invitation.getIsAccepted() != null){
-            log.error("【拒绝好友添加申请】该好友添加申请已处理");
+            log.error("【拒绝群邀请】该群邀请已处理");
             throw new FriendException(ErrorCode.INVITATION_ALREADY_HANDLE);
         }
         invitation.setIsAccepted(false);

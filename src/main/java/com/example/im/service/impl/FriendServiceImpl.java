@@ -52,11 +52,7 @@ public class FriendServiceImpl implements FriendService {
     @Transactional(rollbackFor = {UserException.class, FriendException.class})
     public void remove(String userId, String friendId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Friend friend = friendDao.find(userId, friendId);
-            if (friend == null){
-                log.error("【删除好友】该好友不存在");
-                throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
-            }
+            Friend friend = findOne(userId, friendId);
             friendDao.deleteById(friend.getId());
         } else {
             log.error("【删除好友】该用户不存在");
@@ -66,7 +62,12 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public Friend findOne(String userId, String friendId) {
-        return friendDao.find(userId, friendId);
+        Friend friend = friendDao.find(userId, friendId);
+        if (friend == null) {
+            log.error("【查找好友】该好友不存在");
+            throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
+        }
+        return friend;
     }
 
     @Override
@@ -78,11 +79,7 @@ public class FriendServiceImpl implements FriendService {
     @Transactional(rollbackFor = {UserException.class, FriendException.class})
     public Friend blacklist(String userId, String friendId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Friend friend = friendDao.find(userId, friendId);
-            if (friend == null){
-                log.error("【拉黑好友】该好友不存在");
-                throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
-            }
+            Friend friend = findOne(userId, friendId);
             if (userId.equals(friend.getUserId())){
                 if (friend.getIsFriendBlacklisted()){
                     log.error("【拉黑好友】该好友已拉黑");
@@ -106,11 +103,7 @@ public class FriendServiceImpl implements FriendService {
     @Transactional(rollbackFor = {UserException.class, FriendException.class})
     public Friend unblacklist(String userId, String friendId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Friend friend = friendDao.find(userId, friendId);
-            if (friend == null){
-                log.error("【解除拉黑好友】该好友不存在");
-                throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
-            }
+            Friend friend = findOne(userId, friendId);
             if (userId.equals(friend.getUserId())){
                 if (!friend.getIsFriendBlacklisted()){
                     log.error("【解除拉黑好友】该好友已解除拉黑");
@@ -134,11 +127,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public Friend move(String userId, String friendId, Integer labelId) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Friend friend = friendDao.find(userId, friendId);
-            if (friend == null){
-                log.error("【改变好友所在分组】该好友不存在");
-                throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
-            }
+            Friend friend = findOne(userId, friendId);
             if (labelId == null) {
                 if (userId.equals(friend.getUserId())){
                     if (friend.getULabelId() == null){
@@ -183,11 +172,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public Friend remark(String userId, String friendId, String remark) {
         if (userService.isExists(userId) && userService.isExists(friendId)){
-            Friend friend = friendDao.find(userId, friendId);
-            if (friend == null){
-                log.error("【修改好友备注】该好友不存在");
-                throw new FriendException(ErrorCode.FRIEND_NOT_EXISTS);
-            }
+            Friend friend = findOne(userId, friendId);
             if (userId.equals(friend.getUserId())){
                 if (remark.equals(friend.getURemark())){
                     log.error("【修改好友备注】修改前后备注不能相同");

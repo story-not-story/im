@@ -4,7 +4,7 @@ package com.example.im.controller;
 import com.example.im.entity.GroupInvitation;
 import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
-import com.example.im.exception.FriendException;
+import com.example.im.exception.GroupException;
 import com.example.im.result.Result;
 import com.example.im.service.GroupInvitationService;
 import com.example.im.service.MemberService;
@@ -40,12 +40,15 @@ public class GroupInvitationController {
     @Autowired
     private MemberService memberService;
     @ApiOperation(value = "创建拉好友进群的邀请", httpMethod = "POST")
-    @ApiImplicitParam(name = "invitation", value = "群邀请具体参数", dataTypeClass = GroupInvitation.class, required = true)
     @PostMapping
     public Result create(@Valid GroupInvitation invitation, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
-            log.error("【用户注册】参数错误");
-            throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+            log.error("【邀请好友进群】参数错误");
+            throw new GroupException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
+        if (memberService.isMember(invitation.getGroupId(), invitation.getReceiverId())) {
+            log.error("【邀请好友进群】已经是群成员");
+            throw new GroupException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
         GroupInvitation invitationResult = invitationService.create(invitation);
         Map<String, String> map = new HashMap<>(1);

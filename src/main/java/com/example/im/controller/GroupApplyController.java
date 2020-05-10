@@ -4,7 +4,7 @@ package com.example.im.controller;
 import com.example.im.entity.GroupApply;
 import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
-import com.example.im.exception.FriendException;
+import com.example.im.exception.GroupException;
 import com.example.im.result.GroupApplyResult;
 import com.example.im.result.Result;
 import com.example.im.service.GroupApplyService;
@@ -12,7 +12,9 @@ import com.example.im.service.MemberService;
 import com.example.im.util.KeyUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -41,12 +43,15 @@ public class GroupApplyController {
     @Autowired
     private MemberService memberService;
     @ApiOperation(value = "创建加群申请", httpMethod = "POST")
-    @ApiImplicitParam(name = "apply", value = "加群申请具体参数", dataTypeClass = GroupApply.class, required = true)
     @PostMapping
     public Result create(@Valid GroupApply apply, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
-            log.error("【用户注册】参数错误");
-            throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+            log.error("【创建加群申请】参数错误");
+            throw new GroupException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
+        if (memberService.isMember(apply.getGroupId(), apply.getUserId())) {
+            log.error("【创建加群申请】已经是群成员");
+            throw new GroupException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
         GroupApply applyResult = applyService.create(apply);
         Map<String, String> map = new HashMap<>(1);
@@ -85,7 +90,7 @@ public class GroupApplyController {
     @GetMapping("/reject")
     public Result reject(@RequestParam String id){
         GroupApply apply = applyService.reject(id);
-        return ResultUtil.success(apply);
+        return ResultUtil.success();
     }
 
     @ApiOperation(value = "同意加群申请", httpMethod = "GET")

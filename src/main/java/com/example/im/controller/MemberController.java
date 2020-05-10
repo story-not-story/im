@@ -1,11 +1,10 @@
 package com.example.im.controller;
 
 import com.example.im.entity.Member;
-import com.example.im.entity.User;
-import com.example.im.exception.UserException;
 import com.example.im.result.MemberResult;
 import com.example.im.result.Result;
-import com.example.im.service.*;
+import com.example.im.service.MemberService;
+import com.example.im.service.UserService;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
 import io.swagger.annotations.Api;
