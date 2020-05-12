@@ -23,5 +23,5 @@ public class Group {
     private String name;
     private String signature;
     private String notice;
-    private String avatar;
+    private String avatar = "gavatar.png";
 }

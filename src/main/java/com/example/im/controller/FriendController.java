@@ -6,7 +6,7 @@ import com.example.im.exception.FriendException;
 import com.example.im.result.FriendResult;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
-import com.example.im.util.CharUtil;
+import com.example.im.util.PinYinUtil;
 import com.example.im.util.ResultUtil;
 import com.example.im.util.converter.DO2VO;
 import io.swagger.annotations.Api;
@@ -41,23 +41,14 @@ public class FriendController {
         List<Friend> friendList = friendService.findAll(userId);
         List<FriendResult> friendResultList = friendList.stream().map(o -> DO2VO.convert(o, userId)).collect(Collectors.toList());
         Map<Character, List<FriendResult>> letterMap = new TreeMap<>();
-        char other = '#';
         for (FriendResult friendResult:
              friendResultList) {
-            char letter = CharUtil.toUpper(friendResult.getRemark().charAt(0));
-            if (CharUtil.isLetter(letter)) {
-                if (!letterMap.containsKey(letter)) {
-                    letterMap.put(letter, new ArrayList<FriendResult>());
-                }
-                letterMap.get(letter).add(friendResult);
-            } else {
-                if (!letterMap.containsKey(other)) {
-                    letterMap.put(other, new ArrayList<>());
-                }
-                letterMap.get(other).add(friendResult);
+            Character letter = PinYinUtil.getFirstChar(friendResult.getRemark());
+            if (!letterMap.containsKey(letter)) {
+                letterMap.put(letter, new ArrayList<FriendResult>());
             }
+            letterMap.get(letter).add(friendResult);
         }
-
         return ResultUtil.success(letterMap);
     }
 

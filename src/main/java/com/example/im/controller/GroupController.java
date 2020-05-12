@@ -5,6 +5,7 @@ import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MemberGrade;
 import com.example.im.exception.GroupException;
+import com.example.im.form.GroupForm;
 import com.example.im.result.Result;
 import com.example.im.service.FriendService;
 import com.example.im.service.GroupService;
@@ -19,8 +20,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,29 +44,25 @@ public class GroupController {
     @Autowired
     private FriendService friendService;
     @ApiOperation(value = "创建群聊", httpMethod = "POST", notes = "命名群聊和未命名群聊")
-    @ApiImplicitParams(
-            value = {
-                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
-                    @ApiImplicitParam(name = "name", value = "群聊名称", defaultValue = "考研群", dataTypeClass = String.class),
-                    @ApiImplicitParam(name = "userId", value = "群聊签名", defaultValue = "好好学习，天天向上", dataTypeClass = String.class),
-                    @ApiImplicitParam(name = "userIdList[]", value = "群聊成员", dataTypeClass = String.class, allowMultiple = true)
-            }
-    )
     @PostMapping
-    public Result create(@RequestParam String userId, @RequestParam(required = false) String name, @RequestParam(required = false) String signature, @RequestParam(value = "userIdList[]", required = false) List<String> userIdList){
+    public Result create(@Valid GroupForm groupForm, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            log.error("【创建群聊】参数错误");
+            throw new GroupException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
         Group group = new Group();
         group.setId(KeyUtil.getUniqueKey());
-        group.setName(name);
-        group.setSignature(signature);
+        group.setName(groupForm.getName());
+        group.setSignature(groupForm.getSignature());
         Group groupResult = groupService.save(group);
         Member member = new Member();
         member.setId(KeyUtil.getUniqueKey());
         member.setGroupId(groupResult.getId());
-        member.setUserId(userId);
+        member.setUserId(groupForm.getUserId());
         member.setGrade(MemberGrade.OWNER.getCode());
         Member memberResult = memberService.add(member);
-        if (!CollectionUtils.isEmpty(userIdList)) {
-            userIdList.stream().filter(o -> friendService.isFriend(userId, o)).forEach(o -> {
+        if (!CollectionUtils.isEmpty(groupForm.getUserIdList())) {
+            groupForm.getUserIdList().stream().filter(o -> friendService.isFriend(groupForm.getUserId(), o)).forEach(o -> {
                 Member m = new Member();
                 m.setId(KeyUtil.getUniqueKey());
                 m.setGroupId(groupResult.getId());

@@ -1,8 +1,8 @@
 package com.example.im.form;
 
+import com.example.im.validate.Password;
+import com.example.im.validate.TextRange;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * @author HuJun
@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class LoginForm {
-    @NotNull
+    @TextRange(min = 19, max = 19)
     private String id;
-    @NotNull
+    @Password
     private String password;
 }

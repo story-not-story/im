@@ -30,7 +30,7 @@ public class User {
     @ApiModelProperty(name = "name", value = "昵称", dataType = "String", example = "jojo")
     private String name;
     @ApiModelProperty(name = "avatar", value = "头像", dataType = "String", example = "1.jpg")
-    private String avatar;
+    private String avatar = "favatar.png";
     @ApiModelProperty(name = "sex", value = "性别", dataType = "Boolean", example = "0")
     private Boolean sex;
     @ApiModelProperty(name = "birthdate", value = "出生日期", dataType = "Date", example = "2019年-12月-23日")

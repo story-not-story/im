@@ -1,10 +1,10 @@
 package com.example.im.form;
 
+import com.example.im.validate.Password;
+import com.example.im.validate.TextRange;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * @author HuJun
@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class RegisterForm {
     @ApiModelProperty(name = "name", value = "昵称", dataType = "String", required = true, example = "芒果真好吃")
-    @NotNull
+    @TextRange
     private String name;
     @ApiModelProperty(name = "password", value = "密码", dataType = "String", required = true, example = "jsjfl424f")
-    @NotNull
+    @Password
     private String password;
 }
