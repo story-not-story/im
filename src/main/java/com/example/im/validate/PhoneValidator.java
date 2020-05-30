@@ -9,11 +9,11 @@ import javax.validation.ConstraintValidatorContext;
  * @author HuJun
  * @date 2020/5/12 9:27 下午
  */
-public class PasswordValidator implements ConstraintValidator<Password, String> {
+public class PhoneValidator implements ConstraintValidator<Phone, String> {
     private String regexp;
     private boolean canNull;
     @Override
-    public void initialize(Password constraintAnnotation) {
+    public void initialize(Phone constraintAnnotation) {
         canNull = constraintAnnotation.canNull();
         regexp = constraintAnnotation.regexp();
     }

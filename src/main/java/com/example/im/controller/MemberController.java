@@ -58,6 +58,7 @@ public class MemberController {
         return ResultUtil.success(map);
     }
 
+
     @ApiOperation(value = "删除群成员", httpMethod = "DELETE")
     @ApiImplicitParams(
             value = {

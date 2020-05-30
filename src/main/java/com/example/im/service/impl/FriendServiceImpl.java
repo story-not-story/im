@@ -130,17 +130,17 @@ public class FriendServiceImpl implements FriendService {
             Friend friend = findOne(userId, friendId);
             if (labelId == null) {
                 if (userId.equals(friend.getUserId())){
-                    if (friend.getULabelId() == null){
-                        log.error("【改变好友所在分组】移动前后分组不能相同");
-                        throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
-                    }
-                    friend.setULabelId(labelId);
-                } else {
                     if (friend.getFLabelId() == null){
                         log.error("【改变好友所在分组】移动前后分组不能相同");
                         throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
                     }
                     friend.setFLabelId(labelId);
+                } else {
+                    if (friend.getULabelId() == null){
+                        log.error("【改变好友所在分组】移动前后分组不能相同");
+                        throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
+                    }
+                    friend.setULabelId(labelId);
                 }
             } else {
                 Label label = labelService.findById(labelId);
@@ -149,17 +149,17 @@ public class FriendServiceImpl implements FriendService {
                     throw new FriendException(ErrorCode.LABEL_NOT_EXISTS);
                 }
                 if (userId.equals(friend.getUserId())){
-                    if (labelId.equals(friend.getULabelId())){
-                        log.error("【改变好友所在分组】移动前后分组不能相同");
-                        throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
-                    }
-                    friend.setULabelId(labelId);
-                } else {
                     if (labelId.equals(friend.getFLabelId())){
                         log.error("【改变好友所在分组】移动前后分组不能相同");
                         throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
                     }
                     friend.setFLabelId(labelId);
+                } else {
+                    if (labelId.equals(friend.getULabelId())){
+                        log.error("【改变好友所在分组】移动前后分组不能相同");
+                        throw new FriendException(ErrorCode.LABEL_MUST_DIFF);
+                    }
+                    friend.setULabelId(labelId);
                 }
             }
             return friendDao.save(friend);
@@ -174,17 +174,17 @@ public class FriendServiceImpl implements FriendService {
         if (userService.isExists(userId) && userService.isExists(friendId)){
             Friend friend = findOne(userId, friendId);
             if (userId.equals(friend.getUserId())){
-                if (remark.equals(friend.getURemark())){
-                    log.error("【修改好友备注】修改前后备注不能相同");
-                    throw new FriendException(ErrorCode.REMARK_NOT_SAME);
-                }
-                friend.setURemark(remark);
-            } else {
                 if (remark.equals(friend.getFRemark())){
                     log.error("【修改好友备注】修改前后备注不能相同");
                     throw new FriendException(ErrorCode.REMARK_NOT_SAME);
                 }
                 friend.setFRemark(remark);
+            } else {
+                if (remark.equals(friend.getURemark())){
+                    log.error("【修改好友备注】修改前后备注不能相同");
+                    throw new FriendException(ErrorCode.REMARK_NOT_SAME);
+                }
+                friend.setURemark(remark);
             }
             return friendDao.save(friend);
         } else {

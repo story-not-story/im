@@ -57,6 +57,10 @@ public class InvitationController {
             log.error("【创建加好友申请】参数错误");
             throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
         }
+        if (invitation.getId() != null || invitation.getIsAccepted() != null) {
+            log.error("【创建加好友申请】参数错误");
+            throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), "id和isAccepted必须为空");
+        }
         if (friendService.isFriend(invitation.getSenderId(), invitation.getReceiverId())) {
             log.error("【创建加好友申请】已经是好友");
             throw new FriendException(ErrorCode.FRIEND_ALREADY_EXISTS);
@@ -130,13 +134,13 @@ public class InvitationController {
         Friend friend = new Friend();
         friend.setUserId(invitation.getSenderId());
         friend.setFriendId(invitation.getReceiverId());
-        friend.setURemark(invitation.getRemark());
-        friend.setULabelId(invitation.getLabelId());
+        friend.setFRemark(invitation.getRemark());
+        friend.setFLabelId(invitation.getLabelId());
         if (invitation.getLabelId() != null){
             try {
                 labelService.findById(invitation.getLabelId());
             } catch (LabelException e) {
-                friend.setULabelId(null);
+                friend.setFLabelId(null);
             }
         }
         Friend friendResult = friendService.add(friend);

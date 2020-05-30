@@ -6,14 +6,14 @@ import java.lang.annotation.*;
 
 /**
  * @author HuJun
- * @date 2020/5/12 9:22 下午
+ * @date 2020/5/13 10:40 下午
  */
 @Documented
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordValidator.class)
-public @interface Password {
-    String regexp() default "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+@Constraint(validatedBy = PhoneValidator.class)
+public @interface Phone {
+    String regexp() default "^1[3456789]\\d{9}$";
 
     boolean canNull() default false;
 

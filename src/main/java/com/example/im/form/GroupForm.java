@@ -21,6 +21,7 @@ public class GroupForm {
     @TextRange(canNull = true)
     private String name;
     @ApiModelProperty(name = "signature", value = "群签名", dataType = "String", example = "文字感动心灵")
+    @TextRange(canNull = true, max = 80)
     private String signature;
     @ApiModelProperty(name = "userIdList", value = "群成员ID列表", dataType = "List", example = "[1586969516508397974, 1587483395687238129]")
     private List<String> userIdList;

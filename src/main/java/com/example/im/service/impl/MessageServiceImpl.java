@@ -6,6 +6,7 @@ import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MessageStatus;
 import com.example.im.exception.MessageException;
+import com.example.im.service.FriendService;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
 import com.example.im.util.JsonUtil;
@@ -32,25 +33,42 @@ public class MessageServiceImpl implements MessageService {
     private MessageDao messageDao;
 
     @Autowired
+    private FriendService friendService;
+
+    @Autowired
     private MemberService memberService;
     @Override
     public List<Message> findTop(String userId) {
         List<String> groupIdList = memberService.findByUserId(userId).stream().map(Member::getGroupId).collect(Collectors.toList());
-        return messageDao.findTop(userId, groupIdList);
+        return messageDao.findTop(userId, groupIdList).stream().filter(o -> o.getIsGroup() || friendService.isFriend(o.getSenderId(), o.getReceiverId())).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findByGroupId(String userId, String groupId, Pageable pageable) {
         return messageDao.findByGroupId(groupId, pageable).getContent().stream().filter(o ->
-                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
         ).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findByFriend(String userId, String friendId, Pageable pageable) {
         return messageDao.findByFriend(userId, friendId, pageable).getContent().stream().filter(o ->
-                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByGroupId(String userId, String groupId) {
+        messageDao.findByGroupId(groupId).stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).forEach(o -> delete(o.getId(), userId));
+    }
+
+    @Override
+    public void deleteByFriend(String userId, String friendId) {
+        messageDao.findByFriend(userId, friendId).stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).forEach(o -> delete(o.getId(), userId));
     }
 
     @Override
@@ -102,8 +120,25 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> findByContentLike(String userId, String content) {
-        return messageDao.findByContentLike(userId, content).stream().filter(o ->
-                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        List<String> groupIdList = memberService.findByUserId(userId).stream().map(Member::getGroupId).collect(Collectors.toList());
+        return messageDao.findByContentLike(userId, content, groupIdList).stream().filter(o -> {
+            boolean isExists = o.getIsGroup() || friendService.isFriend(o.getReceiverId(), o.getSenderId());
+            boolean isVisible = MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId);
+            return isExists && isVisible;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> findByGroupContent(String userId, String groupId, String content, Pageable pageable) {
+        return messageDao.findByContentLike(groupId, content, pageable).getContent().stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
+        ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> findByFriendContent(String userId, String friendId, String content, Pageable pageable) {
+        return messageDao.findByContentLike(userId, friendId, content, pageable).getContent().stream().filter(o ->
+                MessageStatus.NORMAL.getCode().equals(o.getStatus()) || MessageStatus.DELETED.getCode().equals(o.getStatus()) && !JsonUtil.toList(o.getInvisible(), String.class).contains(userId)
         ).collect(Collectors.toList());
     }
 

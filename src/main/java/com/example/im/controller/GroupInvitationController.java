@@ -4,6 +4,7 @@ package com.example.im.controller;
 import com.example.im.entity.GroupInvitation;
 import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
+import com.example.im.exception.FriendException;
 import com.example.im.exception.GroupException;
 import com.example.im.result.Result;
 import com.example.im.service.GroupInvitationService;
@@ -45,6 +46,10 @@ public class GroupInvitationController {
         if (bindingResult.hasErrors()){
             log.error("【邀请好友进群】参数错误");
             throw new GroupException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
+        if (invitation.getId() != null || invitation.getIsAccepted() != null) {
+            log.error("【邀请好友进群】参数错误");
+            throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), "id和isAccepted必须为空");
         }
         if (memberService.isMember(invitation.getGroupId(), invitation.getReceiverId())) {
             log.error("【邀请好友进群】已经是群成员");

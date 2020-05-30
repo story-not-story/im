@@ -52,6 +52,20 @@ public class FriendController {
         return ResultUtil.success(letterMap);
     }
 
+    @ApiOperation(value = "显示好友信息", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "friendId", value = "好友ID", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true)
+            }
+    )
+    @GetMapping
+    public Result findOne(@RequestParam String userId, @RequestParam String friendId){
+        Friend friend = friendService.findOne(userId, friendId);
+        FriendResult friendResult = DO2VO.convert(friend, userId);
+        return ResultUtil.success(friendResult);
+    }
+
     @ApiOperation(value = "判断是否是好友", httpMethod = "GET")
     @ApiImplicitParams(
             value = {

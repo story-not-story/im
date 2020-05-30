@@ -50,14 +50,16 @@ public class DO2VO {
         FriendResult friendResult = new FriendResult();
         if (userId.equals(friend.getUserId())){
             friendResult.setFriendId(friend.getFriendId());
-            friendResult.setIsBlacklisted(friend.getIsUserBlacklisted());
-            friendResult.setLabelId(friend.getULabelId());
-            friendResult.setRemark(friend.getURemark());
-        } else {
-            friendResult.setFriendId(friend.getUserId());
-            friendResult.setIsBlacklisted(friend.getIsFriendBlacklisted());
+            friendResult.setIsFriendBlacklisted(friend.getIsFriendBlacklisted());
+            friendResult.setIsMeBlacklisted(friend.getIsUserBlacklisted());
             friendResult.setLabelId(friend.getFLabelId());
             friendResult.setRemark(friend.getFRemark());
+        } else {
+            friendResult.setFriendId(friend.getUserId());
+            friendResult.setIsFriendBlacklisted(friend.getIsUserBlacklisted());
+            friendResult.setIsMeBlacklisted(friend.getIsFriendBlacklisted());
+            friendResult.setLabelId(friend.getULabelId());
+            friendResult.setRemark(friend.getURemark());
         }
         User user =userService.findById(friendResult.getFriendId());
         friendResult.setName(user.getName());

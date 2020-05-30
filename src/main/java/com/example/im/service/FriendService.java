@@ -17,11 +17,11 @@ public interface FriendService {
     Friend add(Friend friend);
 
     /**
-     * 添加好友
-     * @param friend
+     * 批量添加好友
+     * @param friendList
      * @return
      */
-    List<Friend> save(List<Friend> friend);
+    List<Friend> save(List<Friend> friendList);
 
     /**
      * 删除好友

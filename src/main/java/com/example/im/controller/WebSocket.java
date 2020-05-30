@@ -1,11 +1,14 @@
 package com.example.im.controller;
 
+import com.example.im.entity.Friend;
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
 import com.example.im.enums.ErrorCode;
 import com.example.im.enums.MessageStatus;
 import com.example.im.exception.MessageException;
+import com.example.im.result.FriendResult;
 import com.example.im.result.MessageResult;
+import com.example.im.service.FriendService;
 import com.example.im.service.LoginService;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
@@ -37,6 +40,7 @@ public class WebSocket {
     private String userId;
     public static final String HEARTBEAT_REQ = "websocket_test";
     public static final String HEARTBEAT_RES = "ok";
+    public static final String BLACKLISTED = "blacklisted";
     private static ConcurrentHashMap<String, WebSocket> webSocketMap = new ConcurrentHashMap<>();
 
     private  static LoginService loginService;
@@ -49,6 +53,12 @@ public class WebSocket {
     @Autowired
     public void setMemberService(MemberService memberService){
         WebSocket.memberService = memberService;
+    }
+
+    private  static FriendService friendService;
+    @Autowired
+    public void setFriendService(FriendService friendService){
+        WebSocket.friendService = friendService;
     }
 
     private static MessageService messageService;
@@ -90,6 +100,19 @@ public class WebSocket {
             throw new MessageException(ErrorCode.JSON_ERROR);
         }
         if (StringUtil.isNullOrEmpty(msg.getId())){
+            if (!msg.getIsGroup()) {
+                Friend friend = friendService.findOne(msg.getReceiverId(), msg.getSenderId());
+                FriendResult result = DO2VO.convert(friend, msg.getSenderId());
+                if (result.getIsMeBlacklisted()) {
+                    try {
+                        webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(BLACKLISTED);
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                        log.error("【websocket点对点消息】I/O发生错误");
+                    }
+                    return;
+                }
+            }
             msg.setId(KeyUtil.getUniqueKey());
             msg = messageService.save(msg);
         } else {
@@ -103,15 +126,15 @@ public class WebSocket {
             log.error("【收到消息】消息JSON格式错误");
             throw new MessageException(ErrorCode.JSON_ERROR);
         }
-        if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId()) && MessageStatus.NORMAL.getCode().equals(msg.getStatus())) {
-            try {
-                webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(content);
-            } catch(IOException e) {
-                e.printStackTrace();
-                log.error("【websocket点对点消息】I/O发生错误");
-            }
-            return;
-        }
+//        if (!msg.getIsGroup() && !loginService.isLogin(msg.getReceiverId()) && MessageStatus.NORMAL.getCode().equals(msg.getStatus())) {
+//            try {
+//                webSocketMap.get(msg.getSenderId()).session.getBasicRemote().sendText(content);
+//            } catch(IOException e) {
+//                e.printStackTrace();
+//                log.error("【websocket点对点消息】I/O发生错误");
+//            }
+//            return;
+//        }
         if (msg.getIsGroup()){
             sendGroupMessage(msg.getReceiverId(), content);
         } else {

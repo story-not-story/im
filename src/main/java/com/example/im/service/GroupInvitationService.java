@@ -24,7 +24,7 @@ public interface GroupInvitationService {
     List<GroupInvitation> findByReceiverId(String receiverId);
 
     /**
-     * 接收邀好友加入群聊的邀请
+     * 同意邀好友加入群聊的邀请
      * @param id
      * @return
      */

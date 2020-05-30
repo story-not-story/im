@@ -24,7 +24,7 @@ public interface UserService {
     List<User> findByName(String name);
 
     /**
-     * 保存永辉
+     * 保存用户
      * @param user
      * @return
      */

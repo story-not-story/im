@@ -92,10 +92,25 @@ public class GroupController {
                     @ApiImplicitParam(name = "notice", value = "群公告内容", defaultValue = "周五交毕设论文", dataTypeClass = String.class, required = true)
             }
     )
-    @PutMapping
+    @PutMapping("/notice")
     public Result notice(@RequestParam String groupId, @RequestParam String notice){
         Group group = groupService.findById(groupId);
         group.setNotice(notice);
+        groupService.save(group);
+        return ResultUtil.success();
+    }
+
+    @ApiOperation(value = "修改群签名", httpMethod = "PUT")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "groupId", value = "群聊ID", defaultValue = "1586487898500340241", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "signature", value = "群签名", defaultValue = "考研交流群", dataTypeClass = String.class, required = true)
+            }
+    )
+    @PutMapping("/signature")
+    public Result signature(@RequestParam String groupId, @RequestParam String signature){
+        Group group = groupService.findById(groupId);
+        group.setSignature(signature);
         groupService.save(group);
         return ResultUtil.success();
     }
@@ -187,7 +202,7 @@ public class GroupController {
                 return ResultUtil.success(resultList);
             }
         }
-        List<Group> resultList = groupList.stream().filter(o -> o.getName().contains(text) || o.getId().contains(text)).collect(Collectors.toList());
+        List<Group> resultList = groupList.stream().filter(o -> (o.getName() != null && o.getName().contains(text)) || o.getId().contains(text)).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(resultList)) {
             return ResultUtil.error(ErrorCode.GROUP_NOT_EXISTS);
         }

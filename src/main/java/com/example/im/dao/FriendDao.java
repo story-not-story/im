@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface FriendDao extends JpaRepository<Friend, String> {
     /**
-     * 查找两人之间是否是好友关系
+     * 根据userId、friendId查找好友联系
      * @param userId
      * @param friendId
      * @return

@@ -1,7 +1,6 @@
 package com.example.im.service;
 
 import com.example.im.entity.GroupApply;
-import com.example.im.entity.Invitation;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public interface GroupApplyService {
     List<GroupApply> findByGroupId(String groupId);
 
     /**
-     * 接收加群申请
+     * 同意加群申请
      * @param id
      * @return
      */

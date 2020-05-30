@@ -24,7 +24,7 @@ public interface InvitationService {
     List<Invitation> findByUserId(String userId);
 
     /**
-     * 接收添加好友申请
+     * 同意添加好友申请
      * @param id
      * @return
      */

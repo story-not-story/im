@@ -4,6 +4,7 @@ package com.example.im.controller;
 import com.example.im.entity.GroupApply;
 import com.example.im.entity.Member;
 import com.example.im.enums.ErrorCode;
+import com.example.im.exception.FriendException;
 import com.example.im.exception.GroupException;
 import com.example.im.result.GroupApplyResult;
 import com.example.im.result.Result;
@@ -48,6 +49,10 @@ public class GroupApplyController {
         if (bindingResult.hasErrors()){
             log.error("【创建加群申请】参数错误");
             throw new GroupException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
+        }
+        if (apply.getId() != null || apply.getIsAccepted() != null) {
+            log.error("【创建加群申请】参数错误");
+            throw new FriendException(ErrorCode.PARAM_ERROR.getCode(), "id和isAccepted必须为空");
         }
         if (memberService.isMember(apply.getGroupId(), apply.getUserId())) {
             log.error("【创建加群申请】已经是群成员");

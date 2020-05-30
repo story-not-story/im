@@ -97,7 +97,15 @@ public enum ErrorCode {
     /**
      * 对方离线，请刷新页面
      */
-    REFRESH(21, "对方离线，请刷新页面");
+    REFRESH(21, "对方离线，请刷新页面"),
+    /**
+     * 用户密码错误
+     */
+    PASSWORD_ERROR(22, "用户密码错误"),
+    /**
+     * 没有图片
+     */
+    IMG_NOT_EXISTS(23, "无图");
     private Integer code;
     private String msg;
 
