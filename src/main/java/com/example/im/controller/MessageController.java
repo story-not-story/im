@@ -50,8 +50,12 @@ public class MessageController {
     @ApiOperation(value = "模糊匹配搜索内容的消息列表", httpMethod = "GET")
     @ApiImplicitParams(
             value = {
+                    @ApiImplicitParam(name = "isGroup", value = "是否是群消息", defaultValue = "false", dataTypeClass = Boolean.class, required = true),
+                    @ApiImplicitParam(name = "otherId", value = "对方ID（用户或者群）", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true),
                     @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
-                    @ApiImplicitParam(name = "text", value = "搜索内容", defaultValue = "jojo", dataTypeClass = String.class, required = true)
+                    @ApiImplicitParam(name = "text", value = "搜索内容", defaultValue = "jojo", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "pageNo", value = "当前页号", defaultValue = "1", dataTypeClass = Integer.class),
+                    @ApiImplicitParam(name = "pageSize", value = "一页消息条数", defaultValue = "20", dataTypeClass = Integer.class)
             }
     )
     @GetMapping("/search")
@@ -135,6 +139,14 @@ public class MessageController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "批量删除消息", httpMethod = "DELETE")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "isGroup", value = "是否是群消息", defaultValue = "false", dataTypeClass = Boolean.class, required = true),
+                    @ApiImplicitParam(name = "otherId", value = "对方ID（用户或者群）", defaultValue = "1586969360085913084", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true)
+            }
+    )
     @DeleteMapping("/batch")
     public Result batchDelete(@RequestParam Boolean isGroup, @RequestParam String otherId, @RequestParam String userId) {
         if (isGroup) {
