@@ -44,6 +44,20 @@ public class MemberController {
         return ResultUtil.success(userList);
     }
 
+    @ApiOperation(value = "某个群成员信息", httpMethod = "GET")
+    @ApiImplicitParams(
+            value = {
+                    @ApiImplicitParam(name = "userId", value = "用户ID", defaultValue = "1586969516508397974", dataTypeClass = String.class, required = true),
+                    @ApiImplicitParam(name = "groupId", value = "群聊id", defaultValue = "1586487898500340241", dataTypeClass = String.class, required = true)
+            }
+    )
+    @GetMapping("/one")
+    public Result findOne(@RequestParam String userId, @RequestParam String groupId) {
+        Member member = memberService.findOne(groupId, userId);
+        MemberResult memberResult = DO2VO.convert(member);
+        return ResultUtil.success(memberResult);
+    }
+
     @ApiOperation(value = "判断是否是群成员", httpMethod = "GET")
     @ApiImplicitParams(
             value = {
@@ -57,7 +71,6 @@ public class MemberController {
         map.put("isMember", memberService.isMember(groupId, userId));
         return ResultUtil.success(map);
     }
-
 
     @ApiOperation(value = "删除群成员", httpMethod = "DELETE")
     @ApiImplicitParams(

@@ -1,5 +1,6 @@
 package com.example.im.controller;
 
+import com.example.im.config.WebMvcConfig;
 import com.example.im.entity.Friend;
 import com.example.im.entity.Member;
 import com.example.im.entity.Message;
@@ -12,10 +13,7 @@ import com.example.im.service.FriendService;
 import com.example.im.service.LoginService;
 import com.example.im.service.MemberService;
 import com.example.im.service.MessageService;
-import com.example.im.util.JsonUtil;
-import com.example.im.util.KeyUtil;
-import com.example.im.util.ResultUtil;
-import com.example.im.util.StringUtil;
+import com.example.im.util.*;
 import com.example.im.util.converter.DO2VO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +40,12 @@ public class WebSocket {
     public static final String HEARTBEAT_RES = "ok";
     public static final String BLACKLISTED = "blacklisted";
     private static ConcurrentHashMap<String, WebSocket> webSocketMap = new ConcurrentHashMap<>();
+
+    private  static WebMvcConfig webMvcConfig;
+    @Autowired
+    public void setWebMvcConfig(WebMvcConfig webMvcConfig){
+        WebSocket.webMvcConfig = webMvcConfig;
+    }
 
     private  static LoginService loginService;
     @Autowired
@@ -88,7 +92,12 @@ public class WebSocket {
     }
 
     @OnMessage
-    public void onMessage(String message){
+    public void onTextMessage(String message){
+//        if (JsonUtil.getValue(message, "chunk") != null) {
+//            String str = JsonUtil.getValue(message, "chunk");
+//            System.out.println(str);
+//            return;
+//        }
         if (HEARTBEAT_REQ.equals(JsonUtil.getValue(message, "content"))) {
             sendPointMessage(JsonUtil.getValue(message, "userId"), HEARTBEAT_RES, null);
             return;
@@ -166,7 +175,8 @@ public class WebSocket {
                     webSocketMap.get(senderId).session.getBasicRemote().sendText(message);
                 }
             } else if (senderId != null){
-                webSocketMap.get(senderId).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.WEBSOCKET_ERROR)));
+                webSocketMap.get(senderId).session.getBasicRemote().sendText(message);
+//                webSocketMap.get(senderId).session.getBasicRemote().sendText(JsonUtil.toJson(ResultUtil.error(ErrorCode.WEBSOCKET_ERROR)));
             }
         } catch (IOException e) {
             e.printStackTrace();

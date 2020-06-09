@@ -25,7 +25,7 @@ public class Message {
     @NotNull
     private Boolean isGroup;
     private Byte status = 0;
-    private Byte type;
+    private Byte type = 0;
     private String toUserId;
     private Timestamp finishTime;
     private String content;

@@ -33,3 +33,6 @@ url:
 img:
   linux: /Users/yd/githubproject/img/
   windows: D:/img/
+file:
+  linux: /Users/yd/githubproject/file/
+  windows: D:/file/

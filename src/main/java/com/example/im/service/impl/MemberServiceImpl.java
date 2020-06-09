@@ -42,7 +42,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findOne(String groupId, String userId) {
-        return memberDao.find(groupId, userId);
+        Member member = memberDao.find(groupId, userId);
+        if (member == null){
+            log.error("【删除群成员】该群没有该成员");
+            throw new GroupException(ErrorCode.MEMBER_NOT_EXISTS);
+        }
+        return member;
     }
 
     @Override

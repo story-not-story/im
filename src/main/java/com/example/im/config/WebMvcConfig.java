@@ -15,6 +15,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private String imgLinux;
     @Value("${img.windows}")
     private String imgWindows;
+    @Value("${file.linux}")
+    private String fileLinux;
+    @Value("${file.windows}")
+    private String fileWindows;
 
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {
@@ -24,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //                allowedOrigins("http://mango.nat100.top", "http://localhost:8080").allowCredentials(true).maxAge(3600);
 //    }
 
-    public String getUrl() {
+    public String getImgUrl() {
         String os = System.getProperty("os.name");
         if (os.toLowerCase().startsWith("win")) {
             return imgWindows;
@@ -32,10 +36,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
             return imgLinux;
         }
     }
+
+    public String getFileUrl() {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().startsWith("win")) {
+            return fileWindows;
+        } else {
+            return fileLinux;
+        }
+    }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String imgUrl = getUrl();
-        registry.addResourceHandler("/img/**").addResourceLocations("file:" + imgUrl);
+        registry.addResourceHandler("/img/**").addResourceLocations("file:" + getImgUrl());
+        registry.addResourceHandler("/file/**").addResourceLocations("file:" + getFileUrl());
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

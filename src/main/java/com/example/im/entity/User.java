@@ -24,7 +24,7 @@ public class User {
 
     private String name;
 
-    private String avatar = "favatar.png";
+    private String avatar = "uavatar.png";
 
     private Boolean sex;
 

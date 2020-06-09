@@ -29,8 +29,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +52,7 @@ public class UserController {
     @Autowired
     private LoginService loginService;
     @Autowired
-    WebMvcConfig webMvcConfig;
+    private WebMvcConfig webMvcConfig;
     @ApiOperation(value = "注册", httpMethod = "POST")
     @PostMapping("/register")
     public Result register(@Valid RegisterForm registerForm, BindingResult bindingResult){
@@ -148,47 +146,27 @@ public class UserController {
 
     @ApiOperation(value = "修改用户信息", httpMethod = "PUT")
     @PutMapping("/userinfo")
-    public Result userinfoUpdate(@RequestParam MultipartFile imgFile, @Valid UserForm userForm, BindingResult bindingResult){
+    public Result userinfoUpdate(@RequestParam(required = false) MultipartFile imgFile, @Valid UserForm userForm, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             log.error("【修改用户信息】参数错误");
             throw new UserException(ErrorCode.PARAM_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage());
         }
-        String originName = imgFile.getOriginalFilename();
-        String newName = UUID.randomUUID().toString().replace("-", "");
-        int index = originName.indexOf('.');
-        if (index >= 0) {
-            newName += originName.substring(index);
-        }
-        File dir = new File(webMvcConfig.getUrl() + userForm.getId() + "/");
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        File file = new File(webMvcConfig.getUrl() + userForm.getId(), newName);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            imgFile.transferTo(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         User result = userService.findById(userForm.getId());
         BeanUtil.copyProperties(userForm, result);
+        if (imgFile != null) {
+            String avatar = UploadUtil.upload(imgFile, userForm.getId(), webMvcConfig.getImgUrl());
+            if (avatar != null) {
+                result.setAvatar(avatar);
+            }
+        }
         try {
             result.setBirthdate(TimeUtil.toDate(userForm.getBirthdate()));
         } catch (ParseException e) {
             log.error("【修改用户信息】时间转换失败");
             throw new UserException(ErrorCode.PARAM_ERROR);
         }
-        result.setAvatar(userForm.getId() + "/" + newName);
         userService.save(result);
-        Map<String, String> imgMap = new HashMap<>();
-        imgMap.put("avatar", userForm.getId() + "/" + newName);
-        return ResultUtil.success(imgMap);
+        return ResultUtil.success();
     }
 
     @ApiOperation(value = "修改密码", httpMethod = "PUT")
