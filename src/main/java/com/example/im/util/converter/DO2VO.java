@@ -118,12 +118,12 @@ public class DO2VO {
         return messageList.stream().map(message -> {
             MessageResult messageResult = new MessageResult();
             BeanUtil.copyProperties(message, messageResult);
-            String senderId = message.getSenderId();
+            String senderId = message.getSenderId();//群消息的时候是各个群成员id，不一定是userId
             String receiverId = message.getReceiverId();
             if (message.getIsGroup()) {
                 Group group = null;
                 if (isDetail) {
-                    Member member = memberService.findOne(receiverId, userId);
+                    Member member = memberService.findOne(receiverId, senderId);
                     User user = userService.findById(senderId);
                     String name = null;
                     if (member.getName() != null) {
@@ -165,7 +165,7 @@ public class DO2VO {
     public static MessageResult convert(Message message, String userId, boolean isDetail) {
         MessageResult messageResult = new MessageResult();
         BeanUtil.copyProperties(message, messageResult);
-        String senderId = message.getSenderId();
+        String senderId = message.getSenderId();//群消息的时候是各个群成员id，不一定是userId
         String receiverId = message.getReceiverId();
         if (message.getIsGroup()) {
             Group group = null;
